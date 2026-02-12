@@ -1,0 +1,152 @@
+---
+title: "What Marketing Taught Me About Football"
+subtitle: "And What Football Taught Me about Marketing"
+format: html
+jupyter: python3
+---
+
+## Introduction 
+
+The rise of McVay's use of 13 personnel made me think of an old [*Athletic Football Show*](https://youtu.be/93RzplSc3mM?si=_2p7P7xEF0g43bxu&t=3395) episode where they pointed out the use of auxiliary runs to get to explosives. This got me thinking about how can we model the returns on NFL plays.  A major talking point in the 2025 season was Sean McVay's usage of 13 personnel to force another linebacker onto the field. The benefit of this is that they offense has heavier bodies on the field to help the run game but you are keeping more eligible receivers on the field. Since Kyle Shanahan and Sean McVay started as head coaches 8 years ago they have been two of the best play callers and play designers in the game. One way that their offenses are so good is that they find different ways to generate explosive plays. Typically explosive plays are defined as runs of ten plus yards or pass plays of twenty plus yards. Effectively you are gaining the equivalent of one plus first down on one play shortening the field and reducing the number of plays you have to run, or a quick touchdown. 
+
+There are a variety of ways that Kyle Shanahan and Sean McVay try to manipulate defenses. The most obvious ways that they do this is the use of pre-snap motion. Pre-snap motion can help the QB check into the right play by tipping whether a defense is in man or zone. Motion directly before the snap forces the defense to adjust run and pass assignments on the fly creating and getting offensive players up to top speed before they start the play. 
+
+
+Another way that Kyle and Sean  try to manufacture explosive plays is by using personnel packages in creative ways. Each personnel package has certain advantage but, generally, the idea is that you want a certain defenseive personnel grouping on the field and leverage their weaknesses. To make sure we are on the same page on what different personnel packages mean I have broken down the most common ones in @tbl-personnel. Conventionally personnel pacakges are broken down by the number of RBs on the field and the number of TEs on the field.
+
+```{python}
+#| echo: false
+#| label: tbl-personnel 
+#| tbl-cap: "Common Personnel Packages"
+import polars as pl 
+from great_tables import GT
+
+te_df = pl.DataFrame(
+    {'Number of TEs': [1,2,3]}
+)
+
+rb_df = pl.DataFrame(
+    {'Number of RBs': [1,2,3]}
+)
+personnel_df = rb_df.join(te_df, how = 'cross')
+personnel_df = (rb_df
+    .join(te_df, how = 'cross')
+    .with_columns(
+        pl.concat_str([
+            'Number of RBs',
+            'Number of TEs'
+        ]).alias('Personnel Package'))
+    .with_columns(
+        pl.col('Personnel Package').str.to_integer().alias('p')
+    )   
+        .filter(pl.col('p') <= 22)
+        .drop('p')
+)
+
+GT(personnel_df)
+
+```
+
+
+Since the days of the big neckroll the league has shifted. Due to changes in the rules passing has massively upticked. As a result defenses have tried to combat this schematically by playing with less defenders in the box, more defensive backs, and more complex pass coverages. Early on Kyle and Sean used a lot of under-center play action so defenses would simply change the picture on the quarterback when their backs were turned. To counter this Kyle has used a lot of 21 personnel to force a conflict between defending the run with lighter bodies or defending the pass with heavier bodies. 
+
+With all the talk of 13 personnel this year and ton of talk about pre-snap motion from the past few years I got kind of curious. What are the returns of some of these schematic trends and how can we model it? This is an interesting question for a variety of reasons. Should we focus on the design and mechanics of the play or should we focus more on what the bodies on the field get you? Well that kind of depends on a lot of things and as was the case for me what data you can access. Since I only have participation data I decided to look at explosive plays as a function of personnel grouping. 
+
+## How Can We Model This? 
+
+There are lots of ways we can model this but because play callers have these different personel packages that they can use my mind immediately went to Media Mixed Modeling(MMMs). What is an MMM? Lets say you are in a marketing department at a large electronics company with a 1 million dollar budget to spend on advertising. You spend that million dollars across various marketing channels whether this search optimization, TV, email marketing, or influencer marketing.^[There are many more places and ways to advertise] You then see that sales increased that month, but you want to know which channel was responsible for this spike so you can invest your money more wisely. In the early digital marketing age companies relied on multi-touch attribution models. The general idea of this was that if a consumer saw an ad on Facebook clicked on it and got the product. You could track those clicks back to consumer and then estimate a model to better undertand where to put your money. 
+
+However, around 2020 as a response to privacy concerns, laws passed by various governing bodies, and IOS14 these models started to break. More people started using ad blockers, Apple made tracking these attribution points much harder, and some people started using browsers that restricted access to what companies could track. In short, following the customer behavior got a lot harder. So marketing analytics turned to good old fashion experiments and MMMs. The general idea of an MMM is that weekly conversions, sales, revenue, etc are a function of
+
+$$
+Sales_t = \alpha + \overbrace{\sum^{m}_{m=1}\beta_{m}F(x^{*}_{t,m})}^{\text{Impact of marketing}} + \overbrace{\sum^{c}_{c=1} \gamma_{c} Z_{t,c}}^{\text{Impact of Controls}} + \varepsilon_{t}
+$$
+
+
+We can then go ahead and measure the relative contribution of each channel and forecast forward on where we should spend our money and about how much money we should spend on that channel. As you may imagine there are lots of gnarly time dynamics in marketing that you have to deal with. As an electronics company executive you would anticipate that every year in late October to early November sales effectively just stop as people wait for Black Friday sales. You also anticipate that there is only so many ads you can run on the same customer base before they stop caring. 
+
+Snapping back to football this made me think of personnel groupings as channels. You more or less have a fixed number of plays per game which would track with a marketing budget. The play design may be more akin to a specific ads on each of these platforms to adapt to the user base and platform specific rules.^[Admittedly this is a pretty big simplifying assumption.] In addition, both marketing and football deal with really noisy data that try to capture complex behavioral dynamics and you do not have a ton of data to work with generally. Based on this idea I decided to try and build an MMM to understand how play-callers should invest their play budget. Perhaps just as importantly this felt like a fun opportunity to figure out how to build an MMM. 
+
+
+## Building A Regular MMM
+
+For those only interested in the Football stuff you should just skip to the next section. For those sticking around for I am just working through the example provided by [PyMC-Marketing](https://www.pymc-marketing.io/en/stable/notebooks/mmm/mmm_example.html).^[Where this is going to differ is I am going to use Polars instead of Pandas.] We are going to generate some synthetic data for a made up company at the weekly level over two years. This roughly equates to `{python} 52*2` weeks of data.
+
+```{python}
+#| echo: true
+#| code-fold: true
+#| label: mod-import
+
+import arviz as az 
+import matplotlib.pyplot as plt
+import numpy as np 
+import pandas as pd
+import pymc as pm
+import seaborn as sns
+from pymc_extras.prior import Prior
+from pymc_marketing.mmm import GeometricAdstock, LogisticSaturation
+from pymc_marketing.mmm.multidimensional import MMM
+from pymc_marketing.mmm.transformers import geometric_adstock, logistic_saturation
+from datetime import date
+# seed from random.org
+
+seed = 39233615
+rng: np.random.Generator = np.random.default_rng(seed = seed)
+
+min_date = date(2018, 4,1)
+max_date= date(2021, 9, 1)
+
+```
+
+First we are going to generate two years worth of data 
+
+
+```{python}
+
+df = (pl.DataFrame({
+    'date_week': pl.date_range(min_date, max_date, "1d", eager = True)}
+    )
+    .filter(pl.col("date_week").dt.weekday() == 1)
+    .with_columns(
+        pl.col('date_week').dt.year().alias('year'),
+        pl.col('date_week').dt.month().alias('month'),
+        pl.col('date_week').dt.ordinal_day().alias('day_of_year')
+    )
+)
+
+
+```
+
+Next we are going to generate synthetic data for two channels. Which are going to be a bit different based on carryover and the saturation parameters. Roughly the costs for the each of the channels look like this. 
+
+
+```{python}
+n = df.height
+
+
+x1 = rng.uniform(low = 0.0, high = 1.0, size = n)
+x2 = rng.uniform(low = 0.0, high = 1.0, size = n)
+
+df = (
+    df
+    .with_columns(
+        x1_raw = pl.Series(x1), 
+        x2_raw = pl.Series(x2)
+    )
+    .with_columns(
+        pl.when(pl.col('x1_raw') > 0.9)
+        .then(pl.col('x1_raw'))
+        .otherwise((pl.col('x1_raw')/2))
+        .alias('x1'),
+        pl.when(pl.col('x2_raw') >0.8)
+        .then(pl.col("x2_raw"))
+        .otherwise(0)
+        .alias('x2')
+    )
+    .drop(['x1_raw', 'x2_raw'])
+)
+
+long_data = df.unpi
+
+```
+

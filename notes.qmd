@@ -1,0 +1,10 @@
+---
+title: "Notes"
+format: html
+---
+
+## Thinking through the model 
+
+Structurally what we are doing is treating each of the personnel groupings as media channels. So how we invest plays into those channels is going to be responsive to defensive trends, which are unmodeled right now, and personel. In effect we can think of the individual players and the play design as platform specific quirks. While it no doubt matters that Kyle has CMC and Mike McDaniel has DeVon Achane and Raheem Mostert these are being abstracted away. What we care about is that 21 is a way for both play callers to keep an extra linebacker on the field. This doesn't neccessarily change in the time frame that we have. 
+
+Shifts in the explosive play from season to season are in-effect due to evolution as a play-designer, play caller, and personnel acquistions. Whereas the shifts from week to week in a season are a function of offensive health, opponent/opponent health, and game specific quirks. 
