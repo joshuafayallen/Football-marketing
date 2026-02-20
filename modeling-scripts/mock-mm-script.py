@@ -156,9 +156,13 @@ mmm.sample_posterior_predictive(features)
 
 mmm.plot_posterior_predictive()
 
+plt.save
+
 
 mmm.plot_components_contributions()
 mmm.plot_waterfall_components_decomposition()
+
+
 
 
 mmm.model_config

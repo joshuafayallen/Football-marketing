@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -109,55 +144,55 @@ Table&nbsp;1: Common Personnel Packages
 </figcaption>
 <div aria-describedby="tbl-personnel-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output cell-output-display" data-execution_count="1">
-<div id="vpomjszoqo" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="veyuutiwmq" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>
-#vpomjszoqo table {
+#veyuutiwmq table {
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
           -webkit-font-smoothing: antialiased;
           -moz-osx-font-smoothing: grayscale;
         }
 
-#vpomjszoqo thead, tbody, tfoot, tr, td, th { border-style: none; }
+#veyuutiwmq thead, tbody, tfoot, tr, td, th { border-style: none; }
  tr { background-color: transparent; }
-#vpomjszoqo p { margin: 0; padding: 0; }
- #vpomjszoqo .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
- #vpomjszoqo .gt_caption { padding-top: 4px; padding-bottom: 4px; }
- #vpomjszoqo .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
- #vpomjszoqo .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
- #vpomjszoqo .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #vpomjszoqo .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #vpomjszoqo .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
- #vpomjszoqo .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
- #vpomjszoqo .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
- #vpomjszoqo .gt_column_spanner_outer:first-child { padding-left: 0; }
- #vpomjszoqo .gt_column_spanner_outer:last-child { padding-right: 0; }
- #vpomjszoqo .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
- #vpomjszoqo .gt_spanner_row { border-bottom-style: hidden; }
- #vpomjszoqo .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
- #vpomjszoqo .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
- #vpomjszoqo .gt_from_md> :first-child { margin-top: 0; }
- #vpomjszoqo .gt_from_md> :last-child { margin-bottom: 0; }
- #vpomjszoqo .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
- #vpomjszoqo .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
- #vpomjszoqo .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
- #vpomjszoqo .gt_row_group_first td { border-top-width: 2px; }
- #vpomjszoqo .gt_row_group_first th { border-top-width: 2px; }
- #vpomjszoqo .gt_striped { color: #333333; background-color: #F4F4F4; }
- #vpomjszoqo .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
- #vpomjszoqo .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
- #vpomjszoqo .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
- #vpomjszoqo .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
- #vpomjszoqo .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
- #vpomjszoqo .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
- #vpomjszoqo .gt_left { text-align: left; }
- #vpomjszoqo .gt_center { text-align: center; }
- #vpomjszoqo .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
- #vpomjszoqo .gt_font_normal { font-weight: normal; }
- #vpomjszoqo .gt_font_bold { font-weight: bold; }
- #vpomjszoqo .gt_font_italic { font-style: italic; }
- #vpomjszoqo .gt_super { font-size: 65%; }
- #vpomjszoqo .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
- #vpomjszoqo .gt_asterisk { font-size: 100%; vertical-align: 0; }
+#veyuutiwmq p { margin: 0; padding: 0; }
+ #veyuutiwmq .gt_table { display: table; border-collapse: collapse; line-height: normal; margin-left: auto; margin-right: auto; color: #333333; font-size: 16px; font-weight: normal; font-style: normal; background-color: #FFFFFF; width: auto; border-top-style: solid; border-top-width: 2px; border-top-color: #A8A8A8; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #A8A8A8; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; }
+ #veyuutiwmq .gt_caption { padding-top: 4px; padding-bottom: 4px; }
+ #veyuutiwmq .gt_title { color: #333333; font-size: 125%; font-weight: initial; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; border-bottom-color: #FFFFFF; border-bottom-width: 0; }
+ #veyuutiwmq .gt_subtitle { color: #333333; font-size: 85%; font-weight: initial; padding-top: 3px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; border-top-color: #FFFFFF; border-top-width: 0; }
+ #veyuutiwmq .gt_heading { background-color: #FFFFFF; text-align: center; border-bottom-color: #FFFFFF; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #veyuutiwmq .gt_bottom_border { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #veyuutiwmq .gt_col_headings { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; }
+ #veyuutiwmq .gt_col_heading { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; padding-left: 5px; padding-right: 5px; overflow-x: hidden; }
+ #veyuutiwmq .gt_column_spanner_outer { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: normal; text-transform: inherit; padding-top: 0; padding-bottom: 0; padding-left: 4px; padding-right: 4px; }
+ #veyuutiwmq .gt_column_spanner_outer:first-child { padding-left: 0; }
+ #veyuutiwmq .gt_column_spanner_outer:last-child { padding-right: 0; }
+ #veyuutiwmq .gt_column_spanner { border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: bottom; padding-top: 5px; padding-bottom: 5px; overflow-x: hidden; display: inline-block; width: 100%; }
+ #veyuutiwmq .gt_spanner_row { border-bottom-style: hidden; }
+ #veyuutiwmq .gt_group_heading { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; text-align: left; }
+ #veyuutiwmq .gt_empty_group_heading { padding: 0.5px; color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; vertical-align: middle; }
+ #veyuutiwmq .gt_from_md> :first-child { margin-top: 0; }
+ #veyuutiwmq .gt_from_md> :last-child { margin-bottom: 0; }
+ #veyuutiwmq .gt_row { padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; margin: 10px; border-top-style: solid; border-top-width: 1px; border-top-color: #D3D3D3; border-left-style: none; border-left-width: 1px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 1px; border-right-color: #D3D3D3; vertical-align: middle; overflow-x: hidden; }
+ #veyuutiwmq .gt_stub { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; }
+ #veyuutiwmq .gt_stub_row_group { color: #333333; background-color: #FFFFFF; font-size: 100%; font-weight: initial; text-transform: inherit; border-right-style: solid; border-right-width: 2px; border-right-color: #D3D3D3; padding-left: 5px; padding-right: 5px; vertical-align: top; }
+ #veyuutiwmq .gt_row_group_first td { border-top-width: 2px; }
+ #veyuutiwmq .gt_row_group_first th { border-top-width: 2px; }
+ #veyuutiwmq .gt_striped { color: #333333; background-color: #F4F4F4; }
+ #veyuutiwmq .gt_table_body { border-top-style: solid; border-top-width: 2px; border-top-color: #D3D3D3; border-bottom-style: solid; border-bottom-width: 2px; border-bottom-color: #D3D3D3; }
+ #veyuutiwmq .gt_grand_summary_row { color: #333333; background-color: #FFFFFF; text-transform: inherit; padding-top: 8px; padding-bottom: 8px; padding-left: 5px; padding-right: 5px; }
+ #veyuutiwmq .gt_first_grand_summary_row_bottom { border-top-style: double; border-top-width: 6px; border-top-color: #D3D3D3; }
+ #veyuutiwmq .gt_last_grand_summary_row_top { border-bottom-style: double; border-bottom-width: 6px; border-bottom-color: #D3D3D3; }
+ #veyuutiwmq .gt_sourcenotes { color: #333333; background-color: #FFFFFF; border-bottom-style: none; border-bottom-width: 2px; border-bottom-color: #D3D3D3; border-left-style: none; border-left-width: 2px; border-left-color: #D3D3D3; border-right-style: none; border-right-width: 2px; border-right-color: #D3D3D3; }
+ #veyuutiwmq .gt_sourcenote { font-size: 90%; padding-top: 4px; padding-bottom: 4px; padding-left: 5px; padding-right: 5px; text-align: left; }
+ #veyuutiwmq .gt_left { text-align: left; }
+ #veyuutiwmq .gt_center { text-align: center; }
+ #veyuutiwmq .gt_right { text-align: right; font-variant-numeric: tabular-nums; }
+ #veyuutiwmq .gt_font_normal { font-weight: normal; }
+ #veyuutiwmq .gt_font_bold { font-weight: bold; }
+ #veyuutiwmq .gt_font_italic { font-style: italic; }
+ #veyuutiwmq .gt_super { font-size: 65%; }
+ #veyuutiwmq .gt_footnote_marks { font-size: 75%; vertical-align: 0.4em; position: initial; }
+ #veyuutiwmq .gt_asterisk { font-size: 100%; vertical-align: 0; }
  
 </style>
 
@@ -218,9 +253,520 @@ Sales_t = \alpha + \overbrace{\sum^{m}_{m=1}\beta_{m}F(x^{*}_{t,m})}^{\text{Impa
 <p>We can then go ahead and measure the relative contribution of each channel and forecast forward on where we should spend our money and about how much money we should spend on that channel. As you may imagine there are lots of gnarly time dynamics in marketing that you have to deal with. As an electronics company executive you would anticipate that every year in late October to early November sales effectively just stop as people wait for Black Friday sales. You also anticipate that there is only so many ads you can run on the same customer base before they stop caring.</p>
 <p>Snapping back to football this made me think of personnel groupings as channels. You more or less have a fixed number of plays per game which would track with a marketing budget. The play design may be more akin to a specific ads on each of these platforms to adapt to the user base and platform specific rules.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> In addition, both marketing and football deal with really noisy data that try to capture complex behavioral dynamics and you do not have a ton of data to work with generally. Based on this idea I decided to try and build an MMM to understand how play-callers should invest their play budget. Perhaps just as importantly this felt like a fun opportunity to figure out how to build an MMM.</p>
 </section>
-<section id="building-a-regular-mmm" class="level2">
-<h2 class="anchored" data-anchor-id="building-a-regular-mmm">Building A Regular MMM</h2>
-<p>For those only interested in the Football stuff you should just skip to the next section. For those sticking around for I am just working through the example provided by <a href="https://www.pymc-marketing.io/en/stable/notebooks/mmm/mmm_example.html">PyMC-Marketing</a>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> We are going to generate some synthetic data for a made up company at the weekly level over two years. This roughly equates to 104</p>
+<section id="building-a-regular-mmm" class="level1">
+<h1>Building A Regular MMM</h1>
+<section id="making-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="making-the-data">Making The Data</h2>
+<p>For those only interested in the Football stuff you should just skip to the next section. For those sticking around for I am just working through the example provided by <a href="https://www.pymc-marketing.io/en/stable/notebooks/mmm/mmm_example.html">PyMC-Marketing</a>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> We are going to generate some synthetic data for a made up company at the weekly level over two years. This roughly equates to 104 weeks of data.</p>
+<div id="mod-import" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> arviz <span class="im">as</span> az </span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np </span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> preliz <span class="im">as</span> pz</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pymc <span class="im">as</span> pm</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pymc_extras.prior <span class="im">import</span> Prior</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pymc_marketing.mmm <span class="im">import</span> GeometricAdstock, LogisticSaturation</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pymc_marketing.mmm.multidimensional <span class="im">import</span> MMM</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pymc_marketing.mmm.transformers <span class="im">import</span> geometric_adstock, logistic_saturation</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datetime <span class="im">import</span> date</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="co"># seed from random.org</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>seed <span class="op">=</span> <span class="dv">39233615</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>rng: np.random.Generator <span class="op">=</span> np.random.default_rng(seed <span class="op">=</span> seed)</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>min_date <span class="op">=</span> date(<span class="dv">2018</span>, <span class="dv">4</span>,<span class="dv">1</span>)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>max_date<span class="op">=</span> date(<span class="dv">2021</span>, <span class="dv">9</span>, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>/Users/josh/Documents/nfl-marketing/.venv/lib/python3.12/site-packages/arviz/__init__.py:39: FutureWarning: 
+ArviZ is undergoing a major refactor to improve flexibility and extensibility while maintaining a user-friendly interface.
+Some upcoming changes may be backward incompatible.
+For details and migration guidance, visit: https://python.arviz.org/en/latest/user_guide/migration_guide.html
+  warn(
+/Users/josh/Documents/nfl-marketing/.venv/lib/python3.12/site-packages/pymc_marketing/pytensor_utils.py:34: FutureWarning: `pytensor.graph.basic.ancestors` was moved to `pytensor.graph.traversal.ancestors`. Calling it from the old location will fail in a future release.
+  from pytensor.graph.basic import ancestors
+/Users/josh/Documents/nfl-marketing/.venv/lib/python3.12/site-packages/pymc_marketing/mmm/multidimensional.py:216: FutureWarning: This functionality is experimental and subject to change. If you encounter any issues or have suggestions, please raise them at: https://github.com/pymc-labs/pymc-marketing/issues/new
+  warnings.warn(warning_msg, FutureWarning, stacklevel=1)</code></pre>
+</div>
+</div>
+<section id="media-costs" class="level3">
+<h3 class="anchored" data-anchor-id="media-costs">Media Costs</h3>
+<p>First we are going to generate two years worth of data</p>
+<div id="c42651b3" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (pl.DataFrame({</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'date_week'</span>: pl.date_range(min_date, max_date, <span class="st">"1d"</span>, eager <span class="op">=</span> <span class="va">True</span>)}</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    .<span class="bu">filter</span>(pl.col(<span class="st">"date_week"</span>).dt.weekday() <span class="op">==</span> <span class="dv">1</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'date_week'</span>).dt.year().alias(<span class="st">'year'</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'date_week'</span>).dt.month().alias(<span class="st">'month'</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'date_week'</span>).dt.ordinal_day().alias(<span class="st">'day_of_year'</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next we are going to generate synthetic data for two channels. Which are going to be a bit different based on carryover and the saturation parameters. Roughly the costs for the each of the channels look like this.</p>
+<div id="800676e7" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> df.height</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>x1 <span class="op">=</span> rng.uniform(low <span class="op">=</span> <span class="fl">0.0</span>, high <span class="op">=</span> <span class="fl">1.0</span>, size <span class="op">=</span> n)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>x2 <span class="op">=</span> rng.uniform(low <span class="op">=</span> <span class="fl">0.0</span>, high <span class="op">=</span> <span class="fl">1.0</span>, size <span class="op">=</span> n)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    df</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        x1_raw <span class="op">=</span> pl.Series(x1), </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>        x2_raw <span class="op">=</span> pl.Series(x2)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        pl.when(pl.col(<span class="st">'x1_raw'</span>) <span class="op">&gt;</span> <span class="fl">0.9</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        .then(pl.col(<span class="st">'x1_raw'</span>))</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>        .otherwise((pl.col(<span class="st">'x1_raw'</span>)<span class="op">/</span><span class="dv">2</span>))</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>        .alias(<span class="st">'x1'</span>),</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        pl.when(pl.col(<span class="st">'x2_raw'</span>) <span class="op">&gt;</span><span class="fl">0.8</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        .then(pl.col(<span class="st">"x2_raw"</span>))</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>        .otherwise(<span class="dv">0</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>        .alias(<span class="st">'x2'</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    .drop([<span class="st">'x1_raw'</span>, <span class="st">'x2_raw'</span>])</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>df.columns</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>long_data <span class="op">=</span> df.unpivot(on <span class="op">=</span> [<span class="st">'x1'</span>,<span class="st">'x2'</span>], index <span class="op">=</span> <span class="st">'date_week'</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>sns.lineplot(data <span class="op">=</span> long_data, x <span class="op">=</span> <span class="st">'date_week'</span>, y <span class="op">=</span> <span class="st">'value'</span>, hue <span class="op">=</span> <span class="st">'variable'</span>, alpha <span class="op">=</span> <span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-5-output-1.png" width="589" height="429" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Next we are going to pass each of these through our adstock function. In media marketing our adstock is effectively our carryover effect. If you see an ad one day how long is that going to stay with you?</p>
+<div id="73523e34" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>alpha1: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.4</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>alpha2: <span class="bu">float</span> <span class="op">=</span> <span class="fl">0.2</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    df</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'x1'</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        .map_batches(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> s: geometric_adstock(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                x <span class="op">=</span> s.to_numpy(),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> alpha1,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                l_max <span class="op">=</span> <span class="dv">8</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>                normalize<span class="op">=</span><span class="va">True</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            ).<span class="bu">eval</span>().flatten(), </span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>            return_dtype<span class="op">=</span>pl.Float64</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">'x1_adstock'</span>),</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'x2'</span>)</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        .map_batches(</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> s: geometric_adstock(</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>                x <span class="op">=</span> s.to_numpy(),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>                alpha <span class="op">=</span> alpha2,</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>                l_max <span class="op">=</span> <span class="dv">8</span>,</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>                normalize<span class="op">=</span><span class="va">True</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>            ).<span class="bu">eval</span>().flatten(), </span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>            return_dtype<span class="op">=</span>pl.Float64</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">'x2_adstock'</span>)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>The next thing we are going to do is add our concentration effects or how much money we spending in each chanel.</p>
+<div id="730cc89f" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>lam1: <span class="bu">float</span> <span class="op">=</span> <span class="fl">4.0</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>lam2: <span class="bu">float</span> <span class="op">=</span> <span class="fl">3.0</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    df</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'x1_adstock'</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        .map_batches(</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> s: </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>            logistic_saturation(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                x <span class="op">=</span> s.to_numpy(),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>                lam <span class="op">=</span> lam1</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>            ).<span class="bu">eval</span>(), </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>            return_dtype<span class="op">=</span>pl.Float64</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">'x1_saturated_adstock'</span>), </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'x2_adstock'</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>        .map_batches(</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> s: </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>            logistic_saturation(</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>                x <span class="op">=</span> s.to_numpy(),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>                lam <span class="op">=</span> lam1</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>            ).<span class="bu">eval</span>(), </span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>            return_dtype<span class="op">=</span>pl.Float64</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">'x2_saturated_adstock'</span>)</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Then as always we are going to plot this to make sure everything is good.</p>
+<div id="c108d05a" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>long_effects <span class="op">=</span> df.unpivot(on <span class="op">=</span> cs.starts_with(<span class="st">'x'</span>), index <span class="op">=</span> <span class="st">'date_week'</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>g <span class="op">=</span> sns.FacetGrid(data<span class="op">=</span> long_effects, col <span class="op">=</span> <span class="st">'variable'</span>, col_wrap <span class="op">=</span> <span class="dv">2</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>g.<span class="bu">map</span>(sns.lineplot, <span class="st">'date_week'</span>, <span class="st">'value'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-8-output-1.png" width="581" height="416" class="figure-img"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-8-output-2.png" width="565" height="854" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>These look pretty good.</p>
+</section>
+<section id="trend-and-seasonal-parts" class="level3">
+<h3 class="anchored" data-anchor-id="trend-and-seasonal-parts">Trend and Seasonal Parts</h3>
+<p>Now we are going to add some seasonality</p>
+<div id="154b9a73" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.with_columns(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    trend<span class="op">=</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        pl.linear_space(<span class="fl">0.0</span>, <span class="fl">50.0</span>, n)  <span class="co"># sequence 0..50 with n samples</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        .add(<span class="fl">10.0</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        .<span class="bu">pow</span>(<span class="fl">1.0</span> <span class="op">/</span> <span class="fl">4.0</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        .sub(<span class="fl">1.0</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    cs<span class="op">=</span>(</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span>(<span class="fl">2.0</span> <span class="op">*</span> <span class="fl">2.0</span> <span class="op">*</span> math.pi <span class="op">*</span> pl.col(<span class="st">"day_of_year"</span>) <span class="op">/</span> <span class="fl">365.5</span>).sin()</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    cc<span class="op">=</span>(</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        (<span class="fl">1.0</span> <span class="op">*</span> <span class="fl">2.0</span> <span class="op">*</span> math.pi <span class="op">*</span> pl.col(<span class="st">"day_of_year"</span>) <span class="op">/</span> <span class="fl">365.5</span>).cos()</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>).with_columns(</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    seasonality<span class="op">=</span><span class="fl">0.5</span> <span class="op">*</span> (pl.col(<span class="st">"cs"</span>) <span class="op">+</span> pl.col(<span class="st">"cc"</span>))</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span><span class="st">"date_week"</span>, y<span class="op">=</span><span class="st">"trend"</span>, color<span class="op">=</span><span class="st">"C2"</span>, label<span class="op">=</span><span class="st">"trend"</span>, data<span class="op">=</span>df, ax<span class="op">=</span>ax)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>sns.lineplot(</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    x<span class="op">=</span><span class="st">"date_week"</span>, y<span class="op">=</span><span class="st">"seasonality"</span>, color<span class="op">=</span><span class="st">"C3"</span>, label<span class="op">=</span><span class="st">"seasonality"</span>, data<span class="op">=</span>df, ax<span class="op">=</span>ax</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>ax.legend(loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"date"</span>, ylabel<span class="op">=</span><span class="va">None</span>)</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Trend &amp; Seasonality Components"</span>, fontsize<span class="op">=</span><span class="dv">18</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)<span class="op">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-9-output-1.png" width="582" height="456" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="making-controls" class="level3">
+<h3 class="anchored" data-anchor-id="making-controls">Making Controls</h3>
+<p>Finally, we will just add our dependent variable and our controls</p>
+<div id="96e207dc" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> rng.normal(loc <span class="op">=</span> <span class="fl">0.0</span>, scale <span class="op">=</span> <span class="fl">0.25</span>, size <span class="op">=</span> n)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>amplitude <span class="op">=</span> <span class="dv">1</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>beta_1 <span class="op">=</span> <span class="fl">3.0</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>beta_2 <span class="op">=</span> <span class="fl">2.0</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>betas <span class="op">=</span> [beta_1, beta_2]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> (</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    df</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>        pl.lit(<span class="fl">2.0</span>).alias(<span class="st">'intercept'</span>),</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>        pl.Series(epsilon).alias(<span class="st">'epsilon'</span>), </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        pl.lit(beta_1).alias(<span class="st">'beta_1'</span>), </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        pl.lit(beta_2).alias(<span class="st">'beta_2'</span>), </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>        event_1<span class="op">=</span>(pl.col(<span class="st">"date_week"</span>) <span class="op">==</span> date(<span class="dv">2019</span>, <span class="dv">5</span>,<span class="dv">13</span>)).cast(pl.Float64),</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>        event_2<span class="op">=</span>(pl.col(<span class="st">"date_week"</span>) <span class="op">==</span> date(<span class="dv">2020</span>, <span class="dv">9</span>, <span class="dv">14</span>)).cast(pl.Float64),</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>        (</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>            pl.col(<span class="st">'intercept'</span>)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.col(<span class="st">'trend'</span>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.col(<span class="st">"seasonality"</span>)</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.lit(<span class="fl">1.5</span>) <span class="op">*</span> pl.col(<span class="st">'event_1'</span>)</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.lit(<span class="fl">2.5</span>) <span class="op">*</span> pl.col(<span class="st">'event_2'</span>)</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.col(<span class="st">'beta_1'</span>) <span class="op">*</span> pl.col(<span class="st">'x1_saturated_adstock'</span>)</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.col(<span class="st">'beta_2'</span>) <span class="op">*</span> pl.col(<span class="st">'x2_saturated_adstock'</span>)</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> pl.col(<span class="st">'epsilon'</span>)</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">'y'</span>)</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span><span class="st">"date_week"</span>, y<span class="op">=</span><span class="st">"y"</span>, color<span class="op">=</span><span class="st">"black"</span>, data<span class="op">=</span>df, ax<span class="op">=</span>ax)</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>ax.<span class="bu">set</span>(xlabel<span class="op">=</span><span class="st">"date"</span>, ylabel<span class="op">=</span><span class="st">"y (thousands)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-10-output-1.png" width="576" height="429" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="https://www.pymc-marketing.io/en/stable/notebooks/mmm/mmm_example.html">We can now go ahead and look at the ground truth</a>, but that is an excercise left for the reader.</p>
+</section>
+</section>
+<section id="building-the-regular-mmm" class="level2">
+<h2 class="anchored" data-anchor-id="building-the-regular-mmm">Building The Regular MMM</h2>
+<p>For whatever reason I found that working with PyMC is just easier to do in pandas so we are going to throw it over to Pandas.</p>
+<div id="6acb7fc5" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>df_pd <span class="op">=</span> df.to_pandas()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>columns_to_keep <span class="op">=</span> [</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"date_week"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"y"</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"x1"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"x2"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"event_1"</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"event_2"</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"day_of_year"</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>mod_df <span class="op">=</span> df_pd[columns_to_keep]</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>mod_df[<span class="st">'t'</span>] <span class="op">=</span> <span class="bu">range</span>(n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The whole stick of using Bayesian stats is to set appropriate priors. We know at least a few things</p>
+<pre><code>- Channel Contributions are positive and vary. So we are going to set a 1 sigma per channel. How much they vary is an open question. The wider the prior the more area we give the model to explore. This has some pros and cons.
+- We kind of expect channels where we spend the most to have more attributed sales. We wouldn't advertise a product targeted for an older audience on TikTok as an example. </code></pre>
+<p>The <code>MMM</code> class in <code>PyMC-Marketing</code> passes parts of your data through the <code>MaxABs</code> scaler in <code>scikit-learn</code>. So we have to express our priors in on this scale. So what would normally be a weakly informative prior may actually be super informative.</p>
+<div id="e67c1c51" class="cell" data-execution_count="11">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> MaxAbsScaler</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>scaler <span class="op">=</span> MaxAbsScaler()</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>examp <span class="op">=</span> (</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    df</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    .with_columns(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>        pl.col(<span class="st">'x1_saturated_adstock'</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        .map_batches(</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>            <span class="kw">lambda</span> s: scaler.fit_transform(s.to_numpy().reshape(<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>)).ravel(),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>            return_dtype <span class="op">=</span> pl.Float64</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        ).alias(<span class="st">'scaled_version'</span>)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="bu">long</span> <span class="op">=</span> examp.unpivot(on <span class="op">=</span> [<span class="st">'x1_saturated_adstock'</span>, <span class="st">'scaled_version'</span>], index<span class="op">=</span> <span class="st">'date_week'</span>)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>fig,ax <span class="op">=</span> plt.subplots()</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>sns.scatterplot(data <span class="op">=</span> <span class="bu">long</span>, x <span class="op">=</span> <span class="st">'date_week'</span>, y<span class="op">=</span> <span class="st">'value'</span>, hue <span class="op">=</span> <span class="st">'variable'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-12-output-1.png" width="589" height="429" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We are going to define our sigma priors as a share of what we spend on them.</p>
+<div id="9d1a2b8a" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>spend_per_channel <span class="op">=</span> mod_df[[<span class="st">'x1'</span>, <span class="st">'x2'</span>]].<span class="bu">sum</span>(axis <span class="op">=</span> <span class="dv">0</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>spend_share <span class="op">=</span>  spend_per_channel<span class="op">/</span>spend_per_channel.<span class="bu">sum</span>()</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>sigma_prior <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> spend_share.to_numpy()</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> mod_df.drop(<span class="st">'y'</span>, axis <span class="op">=</span> <span class="dv">1</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> mod_df[<span class="st">'y'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next we are just going to define some priors.</p>
+<div id="a1963b5d" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>my_priors<span class="op">=</span> {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"intercept"</span>: Prior(<span class="st">"Normal"</span>, mu<span class="op">=</span><span class="fl">0.5</span>, sigma<span class="op">=</span><span class="fl">0.2</span>),</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"adstock_alpha"</span>: Prior(<span class="st">"Beta"</span>, alpha<span class="op">=</span><span class="dv">1</span>, beta<span class="op">=</span><span class="dv">3</span>, dims<span class="op">=</span><span class="st">"channel"</span>),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"saturation_beta"</span>: Prior(<span class="st">"HalfNormal"</span>, sigma<span class="op">=</span>sigma_prior, dims<span class="op">=</span><span class="st">"channel"</span>),</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"saturation_lam"</span>: Prior(<span class="st">"Gamma"</span>, alpha<span class="op">=</span><span class="dv">3</span>, beta<span class="op">=</span><span class="dv">1</span>, dims<span class="op">=</span><span class="st">"channel"</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"gamma_control"</span>: Prior(<span class="st">"Normal"</span>, mu<span class="op">=</span><span class="dv">0</span>, sigma<span class="op">=</span><span class="fl">0.05</span>, dims<span class="op">=</span><span class="st">"control"</span>),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"gamma_fourier"</span>: Prior(<span class="st">"Laplace"</span>, mu<span class="op">=</span><span class="dv">0</span>, b<span class="op">=</span><span class="fl">0.2</span>, dims<span class="op">=</span><span class="st">"fourier_mode"</span>),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"likelihood"</span>: Prior(<span class="st">"Normal"</span>, sigma<span class="op">=</span>Prior(<span class="st">"HalfNormal"</span>, sigma<span class="op">=</span><span class="dv">6</span>)),</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>samp_config <span class="op">=</span> {<span class="st">'progressbar'</span>: <span class="va">True</span>}</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>mmm <span class="op">=</span> MMM(</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    model_config<span class="op">=</span>my_priors,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    sampler_config<span class="op">=</span>samp_config,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    date_column<span class="op">=</span><span class="st">"date_week"</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    adstock<span class="op">=</span>GeometricAdstock(l_max<span class="op">=</span><span class="dv">8</span>),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    saturation<span class="op">=</span>LogisticSaturation(),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    channel_columns<span class="op">=</span>[<span class="st">"x1"</span>, <span class="st">"x2"</span>],</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    control_columns<span class="op">=</span>[<span class="st">"event_1"</span>, <span class="st">"event_2"</span>, <span class="st">"t"</span>],</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>    yearly_seasonality<span class="op">=</span><span class="dv">2</span>,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>    target_column <span class="op">=</span> <span class="st">'y'</span></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>mmm.build_model(X,y)</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>mmm.add_original_scale_contribution_variable(</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    var<span class="op">=</span>[</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"channel_contribution"</span>,</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"control_contribution"</span>,</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"intercept_contribution"</span>,</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">"yearly_seasonality_contribution"</span>,</span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>        <span class="st">"y"</span>,</span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As always we should look a the prior predictive to make sure things look good</p>
+<div id="a480e761" class="cell" data-execution_count="14">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>mmm.sample_prior_predictive(X,y)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fig,axes <span class="op">=</span> mmm.plot.prior_predictive()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Sampling: [adstock_alpha, gamma_control, gamma_fourier, intercept_contribution, saturation_beta, saturation_lam, y, y_sigma]</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-15-output-2.png" width="819" height="376" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Since we have the ability to build a model where we know the true DGP we know these priors are pretty weakly informative. Basically all this means is that we want to give the model a large enough space to explore, but not so big that we let the model go from <span class="math inline">\(-\infty\)</span> to <span class="math inline">\(\infty\)</span></p>
+</section>
+<section id="what-are-some-of-these-parameters" class="level2">
+<h2 class="anchored" data-anchor-id="what-are-some-of-these-parameters">What are some of these parameters?</h2>
+<p>So the entire crux of MMMs is that we don’t expect ads: to work instantly, every additional ad to increase sales, and the effect of an ad to persist that much. Thee multiple avenues to see growth in the outcome of interest was what initially got me thinking about using these models. But when I started digging more into these models these time dynamics became what got me really excited to see how this could work. In this section I am going to borrow heavily from some excellent blog posts by <a href="https://towardsdatascience.com/mastering-marketing-mix-modelling-in-python-7bbfe31360f9/?source=post_page-----49dce1a5b33d---------------------------------------">Ryan O’Sullivan</a></p>
+<section id="adstock" class="level3">
+<h3 class="anchored" data-anchor-id="adstock">Adstock</h3>
+<p>Adstock really just refers to the decay rate. So if I run an advertisement how quickly do those effects diminsh overtime. Adstock is typically conceptualized as a ratio where . Typically adstock is constrained to be between zero and 1 so the Beta distribution is used more often than not. A vagueish prior would be a <span class="math inline">\(adstock \sim \beta(\alpha = 1, \beta = 3)\)</span> or something that looks like this</p>
+<div id="15ed6919" class="cell" data-execution_count="15">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fig, axe <span class="op">=</span> plt.subplots()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>pz.Beta(alpha <span class="op">=</span> <span class="dv">1</span>, beta <span class="op">=</span> <span class="dv">3</span>).plot_pdf()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-16-output-1.png" width="754" height="411" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To build an intuition on what that may mean practically we can simulate some spend</p>
+<div id="82436ced" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>raw_spend <span class="op">=</span> np.array([<span class="dv">1000</span>, <span class="dv">900</span>, <span class="dv">800</span>, <span class="dv">700</span>, <span class="dv">600</span>, <span class="dv">500</span>, <span class="dv">400</span>, <span class="dv">300</span>, <span class="dv">200</span>, <span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>])</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>adstock_spend_1 <span class="op">=</span> geometric_adstock(x<span class="op">=</span>raw_spend, alpha<span class="op">=</span><span class="fl">0.20</span>, l_max<span class="op">=</span><span class="dv">8</span>, normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">eval</span>().flatten()</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>adstock_spend_2 <span class="op">=</span> geometric_adstock(x<span class="op">=</span>raw_spend, alpha<span class="op">=</span><span class="fl">0.50</span>, l_max<span class="op">=</span><span class="dv">8</span>, normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">eval</span>().flatten()</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>adstock_spend_3 <span class="op">=</span> geometric_adstock(x<span class="op">=</span>raw_spend, alpha<span class="op">=</span><span class="fl">0.80</span>, l_max<span class="op">=</span><span class="dv">8</span>, normalize<span class="op">=</span><span class="va">True</span>).<span class="bu">eval</span>().flatten()</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>plt.plot(raw_spend, marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Raw Spend'</span>, color<span class="op">=</span><span class="st">'blue'</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>plt.fill_between(<span class="bu">range</span>(<span class="bu">len</span>(raw_spend)), <span class="dv">0</span>, raw_spend, color<span class="op">=</span><span class="st">'blue'</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>plt.plot(adstock_spend_1, marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Adstock (alpha=0.20)'</span>, color<span class="op">=</span><span class="st">'orange'</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>plt.fill_between(<span class="bu">range</span>(<span class="bu">len</span>(adstock_spend_1)), <span class="dv">0</span>, adstock_spend_1, color<span class="op">=</span><span class="st">'orange'</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>plt.plot(adstock_spend_2, marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Adstock (alpha=0.50)'</span>, color<span class="op">=</span><span class="st">'red'</span>)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>plt.fill_between(<span class="bu">range</span>(<span class="bu">len</span>(adstock_spend_2)), <span class="dv">0</span>, adstock_spend_2, color<span class="op">=</span><span class="st">'red'</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>plt.plot(adstock_spend_3, marker<span class="op">=</span><span class="st">'o'</span>, label<span class="op">=</span><span class="st">'Adstock (alpha=0.80)'</span>, color<span class="op">=</span><span class="st">'purple'</span>)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>plt.fill_between(<span class="bu">range</span>(<span class="bu">len</span>(adstock_spend_3)), <span class="dv">0</span>, adstock_spend_3, color<span class="op">=</span><span class="st">'purple'</span>, alpha<span class="op">=</span><span class="fl">0.2</span>)</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Weeks'</span>)</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Spend'</span>)</span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Geometric Adstock'</span>)</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-17-output-1.png" width="825" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>In effect geometrick adstock is just a weighted average of media spend in the current period and previous periods where we make an assumption about the maximum duratioon of the carryover effect. As the alpha values decrease the impact of the spend overtime. Generally this is used for re-targeting or campaigns with calls to action. Typically the reason you would set a low alpha value is if you are reasonably confident customers have seen the ad you are just trying to get them back onto your website to do something. The Red Cross doesn’t want you to sit there and think about whether you should donate money after a hurricane or earthquake. They want to get you onto the website as quickly as possible to donate resources.</p>
+<p>Inversely if you just get into post-production for a movie and you have a tenative release date 2 months from now running an ad that tries to get you to buy a ticket is not all that helpful. You may want run a campaign where you are trying to get people excited to go to the movies. You would set a higher alpha value to reflect this expected decay. One sticking point about adstock, for me, is that we refer to the alpha parameter, but when we are playing around with the priors to get more realistic looking decays you are going to be changing the beta parameter. So if we wanted to get a similar looking Beta we would do something to this effect.</p>
+<div id="a23f2fd3" class="cell" data-execution_count="17">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>fig, axe <span class="op">=</span> plt.subplots()</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pz.Beta(<span class="dv">1</span>,<span class="dv">2</span> ).plot_pdf(legend <span class="op">=</span> <span class="st">"Infinite Memory: Alpha = 1,Beta = 1"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>pz.Beta(<span class="dv">1</span>,<span class="dv">10</span>).plot_pdf(legend <span class="op">=</span> <span class="st">'Quick Decay:Alpha = 1, Beta = 10'</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>pz.Beta(<span class="dv">1</span>, <span class="dv">5</span>).plot_pdf(legend <span class="op">=</span> <span class="st">'Slowish Decay:Alpha = 1,Beta = 5'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-18-output-1.png" width="836" height="411" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To bring this back to football we can start to imagine how this dynamic arises. During the 2025 season the Rams gained a schematic advantage by using spending more plays in 13 personnel. This allowed the Rams to have heavier bodies on the field while also being able to keep more eligible receivers on the field. The Rams kind of stumbled into this because Puca Nacua sprains his ankle during week 6. We would expect a schematic wrinkle like this to have some boom as teams are caught on the backfoot. However, as the season progresses we expect to see those effects decay a bit. As you the season progresses we would expect explosive plays to regress as teams start to figure out the best ways to match personnel or scheme up ways to stop the Rams. Additionally, as the season progresses more guys tend to get injured so personnel groupings may be less effective. This frees up a defense to invest their resources elsewhere.</p>
+</section>
+</section>
+<section id="saturation" class="level2">
+<h2 class="anchored" data-anchor-id="saturation">Saturation</h2>
+<p>Naturally in marketing and football we would expect that as we invest more resources in a particular channel or playoff grouping the returns start to diminish. With 13 personnel you do get some benefits in the run game. TE tend to be better blockers than wide receivers. However, their are only 1 receivers on the field. You may have to sacrifice some route concepts that wide receivers would normally run since we wouldn’t expect most tight ends to be able to do that and sell the run fake.</p>
+<p>Typically we but a Gamma prior on the saturation parameter. Typically we use Gammas or Inverse Gammas to handle things like rates which are strictly positive, but have no theoretical upper bounds. If you are waiting in line for something you could theoretically wait inline forever, but for the most part there is some practical upperbounds to waitimes.</p>
+<p>Instead of zeroing in on the exact point where the decay happens we are going to place a prior on how quickly we expect diminishing returns start to happen. If we set our saturation to one we expect that for every additional spending unit we would expect the returns to diminish by about a unit. Whereas with a Lambda of 8 we hit that saturation point much quicker.</p>
+<div id="4baac2d8" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>scaled_spend <span class="op">=</span> np.linspace(start<span class="op">=</span><span class="fl">0.0</span>, stop<span class="op">=</span><span class="fl">1.0</span>, num<span class="op">=</span><span class="dv">100</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>saturated_spend_1 <span class="op">=</span> logistic_saturation(x<span class="op">=</span>scaled_spend, lam<span class="op">=</span><span class="dv">1</span>).<span class="bu">eval</span>()</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>saturated_spend_2 <span class="op">=</span> logistic_saturation(x<span class="op">=</span>scaled_spend, lam<span class="op">=</span><span class="dv">2</span>).<span class="bu">eval</span>()</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>saturated_spend_4 <span class="op">=</span> logistic_saturation(x<span class="op">=</span>scaled_spend, lam<span class="op">=</span><span class="dv">4</span>).<span class="bu">eval</span>()</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>saturated_spend_8 <span class="op">=</span> logistic_saturation(x<span class="op">=</span>scaled_spend, lam<span class="op">=</span><span class="dv">8</span>).<span class="bu">eval</span>()</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>scaled_spend, y<span class="op">=</span>saturated_spend_1, label<span class="op">=</span><span class="st">"1"</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>scaled_spend, y<span class="op">=</span>saturated_spend_2, label<span class="op">=</span><span class="st">"2"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>scaled_spend, y<span class="op">=</span>saturated_spend_4, label<span class="op">=</span><span class="st">"4"</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>sns.lineplot(x<span class="op">=</span>scaled_spend, y<span class="op">=</span>saturated_spend_8, label<span class="op">=</span><span class="st">"8"</span>)</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Logistic Saturation'</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Scaled Marketing Spend'</span>)</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Saturated Marketing Spend'</span>)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>plt.legend(title<span class="op">=</span><span class="st">'Lambda'</span>)</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mock-blog-post_files/figure-html/cell-19-output-1.png" width="663" height="523" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can imagine that as we start to invest more plays into a personnel grouping we are leaving explosive plays out of other personnel groupings on the table. One example that comes to mind is that Seattle tends to match every personnel grouping with nickel, or 5 defensive backs. They can do this for a variety of reasons that are partially schematic, but primarily because they can defend the run out of light boxes due to their defensive line. On the backend their corners and safety are not only super athletic, but are also really big. This allows them to match up well against 21 and 13 personnel. Not surprsingly the two teams that run 21 and 13 at the highest rate are other divisional opponents.</p>
+</section>
 </section>
 
 

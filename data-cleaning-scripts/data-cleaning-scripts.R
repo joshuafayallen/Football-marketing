@@ -4,13 +4,11 @@ library(MetBrewer)
 
 
 df = load_participation(
-  seasons = c(2017:2024),
+  seasons = c(2017:2025),
   include_pbp = TRUE
 ) |>
   filter(play_type_nfl %in% c('PASS', 'RUSH'), season_type == 'REG')
 
-
-table(df$season_type)
 
 play_callers = read_csv(
   "https://raw.githubusercontent.com/samhoppen/NFL_public/2f60ca7a84880f63c4349e5e05d3990a66d13a30/data/all_playcallers.csv"
@@ -26,10 +24,30 @@ play_callers = read_csv(
     play_caller_mins = min(season),
     .by = off_play_caller
   ) |>
-  mutate(play_caller_tenure = season - play_caller_mins)
+  mutate(play_caller_tenure = season - play_caller_mins) |>
+  filter(
+    off_play_caller %in%
+      c(
+        'Kyle Shanahan',
+        'Sean McVay',
+        'Ben Johnson',
+        'Josh McDaniels',
+        "Matt LaFleur",
+        'Mike McDaniel',
+        "Kevin O'Conell",
+        'Andy Reid',
+        'Liam Coen'
+      )
+  )
+
+
+# where this fails is that the play caller data doesn't go through the full season
+shanny = play_callers |>
+  filter(off_play_caller == 'Kyle Shanahan', season == 2025)
+
 
 add_play_callers = df |>
-  inner_join(
+  left_join(
     play_callers,
     join_by(nflverse_game_id == game_id, season, week, possession_team == team)
   ) |>
@@ -43,9 +61,13 @@ add_play_callers = df |>
         "Matt LaFleur",
         'Mike McDaniel',
         "Kevin O'Conell",
-        'Andy Reid'
+        'Andy Reid',
+        'Liam Coen'
       )
   )
+
+add_play_callers$season |>
+  max()
 
 write_csv(add_play_callers, 'raw_data/participation-small.csv')
 
@@ -66,7 +88,7 @@ make_outcomes = add_play_callers |>
     offense = ifelse(possession_team == home_team, home_team, away_team),
     defense = ifelse(defteam == home_team, home_team, away_team)
   ) |>
-  group_by(season, nflverse_game_id, off_play_caller) |>
+  group_by(season, nflverse_game_id, off_play_caller, play_type_nfl) |>
   mutate(
     success_rate = mean(success, na.rm = TRUE),
     explosive_play_rate = mean(is_explosive, na.rm = TRUE),
@@ -205,16 +227,19 @@ make_features = add_play_callers |>
       play_type_nfl == 'RUN' & rushing_yards >= 10 ~ 1,
       play_type_nfl == 'PASS' & receiving_yards >= 20 ~ 1,
       .default = 0
-    )
+    ),
+    is_pass = ifelse(play_type_nfl == 'PASS', 1, 0)
   ) |>
   group_by(season, nflverse_game_id, off_play_caller) |>
   summarise(
     success_rate = mean(success, na.rm = TRUE),
     explosive_play_rate = mean(is_explosive, na.rm = TRUE),
     avg_epa = mean(epa, na.rm = TRUE),
-    avg_defenders_in_box = mean(defenders_in_box, na.rm = TRUE)
+    avg_defenders_in_box = mean(defenders_in_box, na.rm = TRUE),
+    avg_pass_rate = mean(is_pass)
   ) |>
   ungroup()
+
 
 make_context_vars = add_play_callers |>
   mutate(
@@ -333,3 +358,10 @@ ggplot(check, aes(x = week, y = value, fill = name)) +
 check |>
   group_by(name) |>
   summarise(mean(value))
+
+
+add_play_callers |>
+  filter(season == 2025)
+
+check = play_callers |>
+  filter(season == 2025)
