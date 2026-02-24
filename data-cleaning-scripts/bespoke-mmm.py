@@ -1,12 +1,11 @@
 import preliz as pz 
 import pymc as pm 
-from pymc_marketing.mmm.transformers import geometric_adstock, hill_function, logistic_saturation
+from pymc_marketing.mmm.transformers import geometric_adstock
 import matplotlib.pyplot as plt 
 import polars as pl
 import pytensor.tensor as pt
 import polars.selectors as cs
 import pandas as pd 
-from sklearn.preprocessing import MaxAbsScaler
 import arviz as az
 import numpy as np
 import seaborn as sns
@@ -380,7 +379,7 @@ with pm.Model(coords = coords) as mmm_hsgp:
                                         mu = 0,
                                         sigma = 0.2, 
                                         dims = 'channels')
-
+    # effectivelly logistic saturation
     x_saturated = ((1-pm.math.exp(-saturation_lam * x_adstock)) / (1 + pm.math.exp(-saturation_lam * x_adstock)))
 
 
