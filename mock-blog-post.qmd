@@ -2,7 +2,12 @@
 title: "What Marketing Taught Me About Football"
 subtitle: "And What Football Taught Me about Marketing"
 format: html
-jupyter: python3
+execute: 
+  warning: false
+  message: false
+  knitr:
+    opts_chunk:
+        fig_pos: "H"
 ---
 
 ## Introduction 
@@ -20,8 +25,6 @@ Another way that Kyle and Sean  try to manufacture explosive plays is by using p
 #| tbl-cap: "Common Personnel Packages"
 import polars as pl 
 import polars.selectors as cs
-from nflreadpy import load_pbp
-from nflreadpy import load_snap_counts
 from great_tables import GT
 
 te_df = pl.DataFrame(
@@ -71,7 +74,7 @@ We can then go ahead and measure the relative contribution of each channel and f
 Snapping back to football this made me think of personnel groupings as channels. You more or less have a fixed number of plays per game which would track with a marketing budget. The play design may be more akin to a specific ads on each of these platforms to adapt to the user base and platform specific rules.^[Admittedly this is a pretty big simplifying assumption.] In addition, both marketing and football deal with really noisy data that try to capture complex behavioral dynamics and you do not have a ton of data to work with generally. Based on this idea I decided to try and build an MMM to understand how play-callers should invest their play budget. Perhaps just as importantly this felt like a fun opportunity to figure out how to build an MMM. 
 
 
-# Building A Regular MMM
+# Building a Regular MMM
 
 ## Making The Data 
 
@@ -101,6 +104,7 @@ rng: np.random.Generator = np.random.default_rng(seed = seed)
 
 min_date = date(2018, 4,1)
 max_date= date(2021, 9, 1)
+plt.rcParams['figure.figsize'] = [12,7]
 
 ```
 
@@ -110,7 +114,7 @@ First we are going to generate two years worth of data
 
 
 ```{python}
-
+#| label: make-years-data
 df = (pl.DataFrame({
     'date_week': pl.date_range(min_date, max_date, "1d", eager = True)}
     )
@@ -130,6 +134,7 @@ Next we are going to generate synthetic data for two channels. Which are going t
 
 ```{python}
 #| code-fold: true
+#| label: make-raw-spend
 n = df.height
 x1 = rng.uniform(low = 0.0, high = 1.0, size = n)
 x2 = rng.uniform(low = 0.0, high = 1.0, size = n)
@@ -168,6 +173,7 @@ Next we are going to pass each of these through our adstock function. In media m
 
 ```{python}
 #| code-fold: True
+#| label: make-adstock
 alpha1: float = 0.4 
 alpha2: float = 0.2
 
@@ -205,6 +211,7 @@ The next thing we are going to do is add our concentration effects or how much m
 
 ```{python}
 #| code-fold: true
+#| label: make-saturation
 lam1: float = 4.0
 lam2: float = 3.0
 
@@ -241,7 +248,6 @@ Then as always we are going to plot this to make sure everything is good.
 ```{python}
 long_effects = df.unpivot(on = cs.starts_with('x'), index = 'date_week')
 
-fig, ax = plt.subplots()
 g = sns.FacetGrid(data= long_effects, col = 'variable', col_wrap = 2)
 g.map(sns.lineplot, 'date_week', 'value')
 
@@ -300,8 +306,6 @@ amplitude = 1
 beta_1 = 3.0
 beta_2 = 2.0
 betas = [beta_1, beta_2]
-
-
 
 
 df = (
@@ -368,8 +372,8 @@ mod_df['t'] = range(n)
 
 The whole stick of using Bayesian stats is to set appropriate priors. We know at least a few things 
 
-    - Channel Contributions are positive and vary. So we are going to set a 1 sigma per channel. How much they vary is an open question. The wider the prior the more area we give the model to explore. This has some pros and cons.
-    - We kind of expect channels where we spend the most to have more attributed sales. We wouldn't advertise a product targeted for an older audience on TikTok as an example. 
+- Channel Contributions are positive and vary. So we are going to set a 1 sigma per channel. How much they vary is an open question. The wider the prior the more area we give the model to explore. This has some pros and cons.
+- We kind of expect channels where we spend the most to have more attributed sales. We wouldn't advertise a product targeted for an older audience on TikTok as an example. 
 
 
 The `MMM` class in `PyMC-Marketing` passes parts of your data through the `MaxABs` scaler in `scikit-learn`. So we have to express our priors in on this scale. So what would normally be a weakly informative prior may actually be super informative. 
@@ -538,9 +542,7 @@ pz.Beta(1, 5).plot_pdf(legend = 'Slowish Decay:Alpha = 1,Beta = 5')
 
 To bring this back to football we can start to imagine how this dynamic arises. During the 2025 season the Rams gained a schematic advantage by using spending more plays in 13 personnel. This allowed the Rams to have heavier bodies on the field while also being able to keep more eligible receivers on the field. The Rams kind of stumbled into this because Puca Nacua sprains his ankle during week 6. We would expect a schematic wrinkle like this to have some boom as teams are caught on the backfoot. However, as the season progresses we expect to see those effects decay a bit. As you the season progresses we would expect explosive plays to regress as teams start to figure out the best ways to match personnel or scheme up ways to stop the Rams. Additionally, as the season progresses more guys tend to get injured so personnel groupings may be less effective. This frees up a defense to invest their resources elsewhere. 
 
-```{python}
 
-```
 
 
 ### Saturation 
@@ -608,6 +610,7 @@ Importatly the entire bit of MMMs are that we can see the channel contributions 
 
 
 ```{python}
+#| code-fold: true
 base_contributions = (
     mmm.idata["posterior"]["intercept_contribution_original_scale"]
     + mmm.idata["posterior"]["control_contribution_original_scale"].sum(dim="control")
@@ -669,7 +672,7 @@ There are a lot of practical friction points with using the `MMM` class from `Py
 from nflreadpy import load_pbp
 import matplotlib.dates as mdates
 
-raw_nfl = load_pbp(seasons = range(2017, 2026))
+raw_nfl = pl.read_parquet('blog-post-data/pbp-data.parquet')
 
 make_explosives = (
     raw_nfl
@@ -721,14 +724,665 @@ axes[1].xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
 
 The important thing for now is to focus on the big gaps between seasons. Right now the line is simply trying to interpolate between seasons. This is just a general thing that these plotting libraries will do. 
 
-Why is this a problem? From a theoretical standpoint what happens during the season is important from week to week play callers are going to adapt to their schedule, player availability, how other teams are playing them, and succesful offensive concepts from others. The other important thing to consider is what happens over the course of a coaching career. Successful teams tend to suffer from brain drain. Right now there are 10 NFL head coaches that were either on Kyle Shanhan or Sean McVay's staff at some point. This is not including current offensive coordinators like Mike McDaniel or Bobby Slowik who had previously worked on their staffs. As a coaching staff starts to experience brain drain we may start to see less returns in the area that they oversaw. 
+Why is this a problem? From a theoretical standpoint what happens during the season is important from week to week play callers are going to adapt to their schedule, player availability, how other teams are playing them, and succesful offensive concepts from others. The other important is does not capture what we care about between seasons, their tenure length does. Successful teams tend to suffer from brain drain. Right now there are 10 NFL head coaches that were either on Kyle Shanhan or Sean McVay's staff at some point. This is not including current offensive coordinators like Mike McDaniel or Bobby Slowik who had previously worked on their staffs. As a coaching staff starts to experience brain drain we may start to see less returns in the area that they oversaw. 
 
-Additionally, as more of these assistants get hired to other teams more teams are exposed to these concepts. Teams have to adapt by not only coming up with different ways to stop these offenses, but invest money and draft picks to get the personnel to maximize these defensive schemes. As the league adapts to the offensive trends foundational concepts to the offense become less effective. This forces other parts of the tree to adapt or be fired. 
+There is a practical tension on the implementation side. Marketing campaigns are naturally going to be on calendar time without huge gaps in the marketing campaign. Naturally, the implentation of and MMM by `PyMC` is going to make the sane decision to use valid date times. We could theoretically use the game date in the classs method but that results a in weird looking trends. Just passing an integer to the class method results in  errors. 
+
+# Football Stuff
+
+If you skipped the non-football section I will give you a brief summary. One of the main motivations to use a MMM is that there are some similarities that make this model interesting. The first being that we expect the returns of new personnel formations and plays out of these formations to decay quickly. The second being that there is a theoretical saturation point where you are just trying to squeeze blood from a stone. In my own head that sounds a lot like the dynamics in a Football season. In this section I am going to go through the full model building process and the Bayesian workflow that led me to the final model. Then, I promise, I will get to the insights about play callers. 
 
 
-Practicallly we run into other problems. The MMM that comes with `PyMC-Marketing` is really well thought out and put together class method using `PyMC`'s model builder class. They have a ton of functionality that you would if you were on an analytics team in a marketing role. As you would imagine one of the things that the developers enforce is that you have to pass a valid date to the `MMM` class. You could hack it a little bit but we are making up data to make it a little more convenient for yourself. 
+## Building the Football Data
+
+For the entire rest of the blog post I rely on data provided by the `nflverse` team. Specifically we are going to look at the participation data from 2017-2024. Prior to 2023 this data were provided by NFL NGS while post 2023 the data are provided by FTN.^[You may know them as the company behind DVOA] Specifically we are interested in the offensive formation columns and defensive personnel. To give you a sense of what this looks like I provide an example for the first 5 plays of the Titans vs Bears game in the 2024 season.
 
 
-# Building A Football MMM
+```{python}
+#| echo: false
 
-If you skipped the non-football section I will give you a brief summary. One of the main motivations to use a MMM is that there are some similarities that make this model interesting. The first being that we expect the returns of new personnel formations and plays out of these formations to decay quickly. The second being that there is a theoretical saturation point where you are just trying to squeeze blood from a stone. 
+from nflreadpy import load_participation
+
+examp = (
+    load_participation()
+    .select(pl.col('nflverse_game_id','offense_personnel', 'defenders_in_box'))
+    .drop('nflverse_game_id')
+    .head(n = 5)
+)
+
+```
+
+The first order of business is to only include offensive plays this is pretty easy since there is a little flag to indicate whether it was a run, pass, special teams play etc. As far as regexs go this was a pretty simple one, but there is one tripping point. Typically we count the fullback as a running packing in these personnel packages, but in a much appreciated effort to keep the raw data intact they are recorded by their roster position. So for the 49ers who typically run 21 personnel you get this.   
+
+
+```{python}
+
+examp2 = (
+    load_participation()
+    .filter((pl.col('defenders_in_box') != 0) & (pl.col('possession_team') == 'SF'))
+    .select(pl.col("offense_personnel"))
+    .head(n = 5)
+    .with_columns(
+        pl.col('offense_personnel').str.extract("(\\d{1} RB)").str.replace('RB','').str.strip_chars_end().alias('n_rbs'),
+        pl.col('offense_personnel').str.extract("(\\d{1} TE)").str.replace('TE','').str.strip_chars_end().alias('n_tes'), 
+        pl.col('offense_personnel').str.extract("(\\d{1} FB)").str.replace('FB','').str.strip_chars_end().alias('n_fb'),
+    )
+    .with_columns(
+        pl.concat_str([
+            pl.col('n_rbs'), 
+            pl.col('n_tes')
+        ]).alias('personnel_grouping')
+
+    )
+)
+
+GT(examp2.drop(['n_rbs', 'n_tes', 'n_fb']))
+
+
+```
+
+The simple trick to this is really just to add the RBs and Fullbacks together then convert those back to strings. 
+
+
+```{python}
+
+fixed = (
+    examp2 
+    .with_columns(
+        (pl.col('n_rbs').cast(pl.Int64).fill_null(0) + pl.col('n_fb').cast(pl.Int64).fill_null(0)).alias("total_rbs")
+    )
+    .with_columns(
+        pl.concat_str(
+            [   pl.lit('personnel_'),
+                pl.col('total_rbs').cast(pl.String),
+                pl.col('n_tes')
+                
+            ]
+        ).alias('personnel_grouping_fixed')
+    ).drop(['n_rbs', 'n_tes', 'n_fb', 'total_rbs'])
+)
+
+GT(fixed)
+
+```
+
+So now these values look more sane than the ones that I initially came up with. The next step is to build the spend share variables and define the relevant time dimensions for between season. I did this in R just because the `nflreadr` version of the package lets you automatically merge the play-by-play data. For the playcaller data I am using [Sam Hoppen's data](https://github.com/samhoppen/NFL_public/blob/main/data/all_playcallers.csv). I just take the minimum for each play caller in the dataset and then subtract it from the current season to get their tenure. This approach does have a drawback just because we would expect that there is a bigger jump for a new playcaller from the start of their first season to the end of their first season.^[Very much open to suggestions on a better way to do this] Whereas a more experienced play caller it may not actually matter that much by the time they hit year four or five. My "ad spend" is just the number of plays that each playcaller makes out of each personell grouping.
+
+
+```{r}
+#| eval: false
+#| code-fold: true
+
+library(nflreadr)
+library(tidyverse)
+
+df = load_participation(
+  seasons = c(2017:2025),
+  include_pbp = TRUE
+) |>
+  filter(play_type_nfl %in% c('PASS', 'RUSH'), season_type == 'REG')
+
+
+play_callers = read_csv(
+  "https://raw.githubusercontent.com/samhoppen/NFL_public/refs/heads/main/data/all_playcallers.csv"
+) |>
+  select(
+    season,
+    team,
+    week,
+    game_id,
+    off_play_caller
+  ) |>
+  mutate(
+    play_caller_mins = min(season),
+    .by = off_play_caller
+  ) |>
+  mutate(play_caller_tenure = season - play_caller_mins) |>
+  filter(
+    off_play_caller %in%
+      c(
+        'Kyle Shanahan',
+        'Sean McVay',
+        'Ben Johnson',
+        'Josh McDaniels',
+        "Matt LaFleur",
+        'Mike McDaniel',
+        "Kevin O'Conell",
+        'Andy Reid',
+        'Liam Coen'
+      )
+  ) |>
+  filter_out(season == 2026)
+
+
+add_play_callers = df |>
+  left_join(
+    play_callers,
+    join_by(nflverse_game_id == game_id, season, week, possession_team == team)
+  ) 
+
+make_snap_shares = add_play_callers |>
+  mutate(
+    n_tes = str_extract(offense_personnel, "\\d+ TE"),
+    n_rbs = str_extract(offense_personnel, "\\d+ RB"),
+    n_fbs = str_extract(offense_personnel, "\\d+ FB"),
+    across(c(n_tes, n_rbs, n_fbs), \(x) ifelse(is.na(x), 0, x)),
+    across(c(n_tes, n_rbs, n_fbs), \(x) str_remove_all(x, "TE|RB|FB| ")),
+    across(c(n_rbs, n_fbs), \(x) as.numeric(x)),
+    n_rbs = as.character(n_rbs + n_fbs),
+    personnel_grouping = as.factor(str_glue("personnel_{n_rbs}{n_tes}"))
+  ) |>
+  mutate(total_snaps = n(), .by = c(off_play_caller, nflverse_game_id)) |>
+  mutate(
+    snaps_by_personnel = n(),
+    .by = c(off_play_caller, nflverse_game_id, personnel_grouping)
+  ) |>
+  mutate(share = (snaps_by_personnel / total_snaps)) |>
+  group_by(personnel_grouping, off_play_caller) |>
+  distinct(nflverse_game_id, .keep_all = TRUE) |>
+  ungroup() |>
+  pivot_wider(
+    names_from = personnel_grouping,
+    values_from = share,
+    values_fill = 0,
+    id_cols = c(nflverse_game_id, off_play_caller)
+  )
+
+
+make_features = add_play_callers |>
+  mutate(
+    is_explosive = case_when(
+      play_type_nfl == 'RUN' & rushing_yards >= 10 ~ 1,
+      play_type_nfl == 'PASS' & receiving_yards >= 20 ~ 1,
+      .default = 0
+    ),
+    is_pass = ifelse(play_type_nfl == 'PASS', 1, 0)
+  ) |>
+  group_by(season, nflverse_game_id, off_play_caller) |>
+  summarise(
+    success_rate = mean(success, na.rm = TRUE),
+    explosive_play_rate = mean(is_explosive, na.rm = TRUE),
+    avg_epa = mean(epa, na.rm = TRUE),
+    avg_defenders_in_box = mean(defenders_in_box, na.rm = TRUE),
+    avg_pass_rate = mean(is_pass)
+  ) |>
+  ungroup()
+
+
+make_context_vars = add_play_callers |>
+  mutate(
+    offense_score = ifelse(
+      possession_team == home_team,
+      total_home_score,
+      total_away_score
+    ),
+    defense_score = ifelse(
+      defteam == home_team,
+      total_home_score,
+      total_away_score
+    ),
+    is_home_team = ifelse(possession_team == home_team, 1, 0),
+    diff = offense_score - defense_score,
+    avg_diff = mean(diff),
+    .by = c(off_play_caller, nflverse_game_id)
+  ) |>
+  group_by(off_play_caller) |>
+  distinct(nflverse_game_id, .keep_all = TRUE) |>
+  select(
+    nflverse_game_id,
+    game_date,
+    stadium,
+    roof,
+    surface,
+    div_game,
+    home_team,
+    wind,
+    temp,
+    is_home_team,
+    avg_diff,
+    off_play_caller,
+    play_caller_tenure,
+  ) |>
+  ungroup() |>
+  mutate(
+    temp = case_when(
+      roof %in% c('closed', 'dome') ~ 60,
+      is.na(temp) ~ 68,
+      .default = temp
+    ),
+    wind = case_when(
+      roof %in% c('closed', 'dome') ~ 0,
+      is.na(wind) ~ 8,
+      .default = wind
+    ),
+    surface = str_squish(surface)
+  )
+
+
+cleaned_data = make_snap_shares |>
+  left_join(make_features) |>
+  left_join(make_context_vars) |>
+  mutate(
+    surface = case_when(
+      nchar(surface) < 1 & stadium == "Levi's® Stadium" ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Tottenham Hotspur Stadium' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Estadio Azteca (Mexico City)' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'MetLife Stadium' ~ 'fiedldturf',
+      nchar(surface) < 1 &
+        stadium == 'GEHA Field at Arrowhead Stadium' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Soldier Field' ~ 'grass',
+      nchar(surface) < 1 & stadium == "M&T Bank Stadium" ~ 'grass',
+      nchar(surface) < 1 & stadium == "Empower Field at Mile High" ~ 'grass',
+      nchar(surface) < 1 & stadium == "SoFi Stadium" ~ 'matrixturf',
+      # spirtually this is still heinz field
+      nchar(surface) < 1 & stadium == 'Acrisure Stadium' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Paycor Stadium' ~ 'a_turf',
+      # technically the superdome is now caesars but lets just be sure
+      nchar(surface) < 1 &
+        stadium == 'Mercedes-Benz Stadium' &
+        home_team == 'ATL' ~ 'fieldturf',
+      nchar(surface) < 1 & stadium == 'EverBank Stadium' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Highmark Stadium' ~ 'astroturf',
+      nchar(surface) < 1 & stadium == 'Gillette Stadium' ~ 'fieldturf',
+      nchar(surface) < 1 & stadium == 'AT&T Stadium' ~ 'fieldturf',
+      nchar(surface) < 1 & stadium == 'Ford Field' ~ 'fieldturf',
+      nchar(surface) < 1 & stadium == 'Arena Corinthians' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Allianz Arena' ~ 'grass',
+      nchar(surface) < 1 & stadium == 'Lumen Field' ~ 'fieldturf',
+      .default = surface
+    ),
+    surface = str_squish(surface),
+    across(c(surface, roof), \(x) as.factor(x))
+  ) |>
+  select(-home_team)
+
+
+```
+
+
+There are a few things in here worth mentioning briefly. Instead of separating out explosive play rate into explosive pass and run I just keep them together and adjust for passing rate. Second I decided to consolidate all the possible surfaces and roofs into just outdoor and indoors. We would really only care if the game is outside, on-grass, and raining/snowing which would probably affect the rate of explosive plays. 
+
+```{python}
+#| label: clean-data-python
+#| code-fold: true
+
+seed = 14993111
+
+RANDOM_SEED = np.random.default_rng(seed = seed)
+
+def plot_prior(trace ,param: str):
+    fig, axe = plt.subplots()
+    return az.plot_dist(trace.prior[param])
+
+
+
+raw_data = (
+    pl.read_parquet('processed-data/processed-dat.parquet')
+    .with_columns(
+        pl.col('nflverse_game_id')
+        .str.extract(r"_(\d{2})_")
+        .str.replace_all('_', '')
+        .str.to_integer()
+        .alias('week'),
+        pl.when(pl.col('surface') == 'grass')
+        .then(pl.lit(1))
+        .otherwise(0)
+        .alias('is_grass'),
+        pl.when(
+        pl.col('roof').is_in(['closed', 'dome']))
+        .then(pl.lit(1))
+        .otherwise(0)
+        .alias('is_indoors')    
+            )
+
+)   
+
+
+raw_data_pd = raw_data.to_pandas()
+
+
+unique_seasons = raw_data_pd['play_caller_tenure'].sort_values().unique()
+
+unique_play_callers = raw_data_pd['off_play_caller'].sort_values().unique()
+
+season_idx = pd.Categorical(
+    raw_data_pd['play_caller_tenure'], categories=unique_seasons
+).codes
+
+
+unique_games = raw_data_pd['week'].sort_values().unique()
+
+games_idx = pd.Categorical(
+    raw_data_pd['week'], categories=unique_games).codes
+
+
+
+coach_idx = pd.Categorical(
+    raw_data_pd['off_play_caller'], categories=unique_play_callers).codes
+
+
+predictors = ['avg_epa', 'avg_defenders_in_box',
+            'is_indoors', 'is_grass', 'div_game',
+            'wind', 'temp', 'is_home_team', 'avg_diff', 'avg_pass_rate']
+
+
+
+just_controls = raw_data_pd[predictors]
+
+nobs = raw_data.height
+
+scaled_y = (
+    raw_data
+    .with_columns(
+    (pl.col('explosive_play_rate') / (pl.col('explosive_play_rate').abs().max())).alias("scaled_explosive_plays")
+    ).with_columns(
+        (((pl.col('scaled_explosive_plays')) * (nobs-1) + 0.5)/nobs).alias("explosive_play_rate_transformed")
+    )
+
+)
+
+
+
+get_stds = (
+    raw_data
+    .group_by('season')
+    .agg(
+        pl.col('explosive_play_rate').std()
+    )
+
+)
+
+
+numeric_cols = (
+    pl.from_pandas(just_controls)
+    .select(
+            pl.exclude('div_game', 'is_home_team', 'is_indoors', 'is_grass')).columns
+)
+
+
+means = (
+    pl.from_pandas(just_controls)
+    .select(
+        [pl.col(c).mean().alias(c) for c in numeric_cols]
+    )
+
+)
+
+
+stds = (
+    pl.from_pandas(just_controls)
+    .select(
+        [pl.col(c).std().alias(c) for c in numeric_cols]
+    )
+
+)
+
+
+
+just_controls_pl = pl.from_pandas(just_controls)
+
+
+
+just_controls_sdz = (
+    just_controls_pl
+    .with_columns(
+        [((pl.col(c) - means[0,c])/ stds[0, c]).alias(c) for c in numeric_cols]
+    )
+    .with_columns(
+        pl.Series("div_game", just_controls_pl['div_game']),
+        pl.Series('is_home_team', just_controls_pl['is_home_team']), 
+        pl.Series('is_indoors', just_controls_pl['is_indoors']), 
+        pl.Series ('is_grass', just_controls_pl['is_grass'])
+    ).to_pandas()
+
+)
+
+personnel_cols = (
+    raw_data.select(cs.starts_with('personnel')).to_pandas()
+)
+just_controls_sdz.columns
+
+usage = personnel_cols.mean(axis = 0)
+
+reliable_cols = usage[usage >= 0.01].index.tolist()
+
+personnel_cols = personnel_cols[reliable_cols]
+
+
+used_cols = (
+    raw_data
+    .select(cs.starts_with('personnel'))
+
+)
+
+
+usage = used_cols.mean()
+
+mask_df = usage.select(
+    [(pl.col(c) >= 0.01).alias(c) for c in usage.columns]
+
+)
+
+mask = mask_df.row(0, named = True)
+
+reliable_cols = [name for name, keep in mask.items() if keep]
+
+personnel_cols = used_cols.select(reliable_cols).columns
+
+personnel_scaled = (
+    raw_data
+    .select(pl.col(personnel_cols))
+    .with_columns(
+        [
+            (pl.col(c) / (pl.col(c).abs().max()))
+            for c in personnel_cols
+        ]
+    ).to_pandas()
+    
+
+)
+
+
+
+```
+
+To speed this process along a little bit I then go and make a few binary indicators, standardize my controls, then apply the max absolute value scaling to my outcome. Since explosive play rate is a proportion we can just model that with the Beta distribution. The issue is that a Beta regression can't model degenerate outcomes. This is statistician for exactly equal to zero or exactly equal to one. 
+
+```{python}
+
+fig, axes = plt.subplots()
+sns.histplot(data = scaled_y, x = 'explosive_play_rate_transformed')
+
+```
+
+
+To handle this I nudged the values of explosive play rate away from zero and one. There are definetly drawbacks to this approach as outlined in [Kubinec 2023](https://www.cambridge.org/core/journals/political-analysis/article/abs/ordered-beta-regression-a-parsimonious-wellfitting-model-for-continuous-data-with-lower-and-upper-bounds/89F4141DA16D4FC217809B5EB45EEE83), but we are still working on a native PyMC implementation. 
+
+## The Model 
+
+We are going to build the model bit by bit. Just so `PyMC` does not get mad at me we are going to define the data first. 
+
+```{python}
+#| code-fold: true
+with pm.Model(coords = coords) as mmm_hsgp: 
+
+    global_controls = pm.Data(
+        'control_data', just_controls_sdz.drop('avg_pass_rate', axis = 1),
+                        dims = ('obs_id', 'predictors')
+    )
+
+    passing_dat = pm.Data('passing_data',
+                            just_controls_sdz['avg_pass_rate'],
+                            dims = 'obs_id')
+
+    personnel_dat = pm.Data(
+        'personel_data', personnel_scaled, dims = ('obs_id','channels')
+    )
+
+    season_data = pm.Data('season_id', season_idx, dims = 'obs_id')
+
+    game_data = pm.Data('game_id', games_idx, dims = 'obs_id' )
+
+    x_seasons = pm.Data('x_seasons', unique_seasons, dims = 'seasons')[:,None]
+
+    x_games = pm.Data('x_games', unique_games, dims = 'games')[:, None]
+
+    obs_exp_plays = pm.Data('obs_exp_plays',
+                            scaled_y['explosive_play_rate_transformed'].to_numpy(),
+                            dims = 'obs_id')
+```
+
+The next step we are going to define the HSGPs for the games and tenure dimensions and the coach effects. 
+
+
+```{python}
+#| code-fold: True
+
+
+def logit(p):
+    return np.log(p / (1 - p))
+with mmm_hsgp:
+    gps_sigma = pm.Exponential('gps_sigma', 10, dims='time_scale')
+
+    ls = pm.InverseGamma('ls',
+                        alpha = np.array([in_season_gp.alpha,
+                                        between_season_gp.alpha]),
+                        beta = np.array([in_season_gp.beta,
+                                        between_season_gp.beta]),
+                        dims='time_scale')
+
+    cov_coach_evo = gps_sigma[0]**2*pm.gp.cov.Matern52(input_dim=1, ls = ls[0])
+
+    cov_game_evo = gps_sigma[1]**2*pm.gp.cov.Matern52(input_dim=1, ls = ls[1])
+
+    gp_coach_evo = pm.gp.HSGP(m = [between_season_m],
+                            c = between_season_c,
+                            cov_func=cov_coach_evo)
+
+    gp_game_evo = pm.gp.HSGP(m = [in_season_m],
+                            c = in_season_c,
+                            cov_func=cov_game_evo)
+
+    coach_evolution = gp_coach_evo.prior('coach_evolution',
+                                            X = x_seasons,
+                                            dims = 'seasons')
+
+    game_evolution = gp_game_evo.prior('game_evolution',
+                                        X = x_games,
+                                        dims = 'games')
+    coach_mean_raw = pm.Normal('coach_mean_raw',
+                                mu = logit(obs_exp_plays.mean()),
+                                sigma = 0.5,
+                                dims = 'play_callers')
+
+    coach_mu = pm.Deterministic('coach_mu', 
+                                coach_mean_raw[coach_idx] + 
+                                coach_evolution[season_idx] +
+                                game_evolution[games_idx],
+                                dims = 'obs_id')
+
+
+```
+
+The next step is to manually build the adstocks for the personnel data. Here we are going to feed each of the personnel groupings through the adstock function. We are basically going to let the defenses look back 3ish games. In some ways this is likely a little restrictive. Teams may look back further than that to guess tendencies or how they play particular styles of defenses. You may see your divisional opponents in the first part of the season and then the final part of the season. 
+
+However, I think that setting the maximum carryover effect to 3 strikes a nice balance. This roughly divides the 16-17 game schedule into 5ish overlapping chunks. Players tend to get hurt throughout the season forcing playcallers to adapt their personnel groupings. Shifts in the offensive philosophy may not have worked out that well or have been adapted to as people see these concepts more and more. The 3 games prior to the 17th maybe more informative than the games in the first three weeks of the season. How this works is that we are going to weight the game last week more than the game two weeks before, and so on and so forth depending on the size of the carryover effect we specify. 
+
+Next we are going to transform it using a logistic saturation function. By doing this all we are saying is that there are only so many plays we can invest into a single personnel grouping during a game before we see diminishing returns. If you play 21 personnel for 70% of the game then moving to 80% is not going to result in a a 10% jump in explosive plays. 
+
+```{python}
+
+
+with mmm_hsgp:
+    for i in range(len(coords['channels'])):
+        cols = personnel_dat[:,i]
+        adstock_list.append(geometric_adstock(cols, adstock_alphas[i],
+                            l_max = 3))
+
+    x_adstock = pt.stack(adstock_list, axis = 1)
+
+    channel_betas = pm.Normal('channel_betas', mu = 0, sigma = 0.5,
+                                dims = 'channels')
+
+    saturation_lam = pm.Gamma('saturation_lamda',
+                                                alpha = 3,
+                                                beta = 0.5, dims = 'channels')
+
+    saturation_slope = pm.LogNormal('saturation_slope',
+                                        mu = 0,
+                                        sigma = 0.2, 
+                                        dims = 'channels')
+    # effectivelly logistic saturation
+    x_saturated = ((1-pm.math.exp(-saturation_lam * x_adstock)) / (1 + pm.math.exp(-saturation_lam * x_adstock)))
+
+
+
+```
+
+Then we are just going to fuse everthing together by taking our saturated x's and our prior on the channel contributions. In this case I separated out the pass rate from the rest of the controls just because I want it to vary a bit more. I ended up doing this just because it seemed to improve sampling and the overall fit of the posterior predictive. 
+
+
+```{python}
+
+with mmm_hsgp:
+     personnel_contribution = pm.Deterministic(
+        'personnel_contribution', 
+        pm.math.dot(x_saturated, channel_betas),
+        dims = 'obs_id'
+
+    )
+
+    passing_prior = pm.Normal('passing_prior', mu = 0, sigma = 0.5)
+
+    controls_beta = pm.Normal('controls_beta', mu=0, sigma= 0.05,
+    dims='predictors')
+
+    control_contribution = pm.Deterministic(
+        'control_contribution', 
+        pm.math.dot(global_controls, controls_beta), 
+        dims='obs_id'
+
+    )
+
+
+
+    mu = pm.Deterministic('mu',
+        coach_mu +  
+        personnel_contribution +  
+        control_contribution + 
+        (pm.math.dot(passing_prior, passing_dat)),      
+        dims='obs_id'
+    )
+    # like 1/20 plays is explosive
+    precision = pm.Exponential('precision', 1/20)
+   
+    mu_logit = pm.math.invlogit(mu)
+  
+
+    pm.Beta(
+        'y_obs', 
+        mu = mu_logit, 
+        nu = precision,
+        observed = obs_exp_plays,
+        dims = 'obs_id')
+
+
+
+```
+
+
+Now we are just going to run the sampling. 
+
+
+```{python}
+
+with mmm_hsgp:
+    idata = pm.sample_prior_predictive()
+    idata.extend(
+        pm.sample(random_seed=RANDOM_SEED, nuts_sampler='numpyro')
+    )
+    idata.extend(
+        pm.sample_posterior_predictive(idata, compile_kwargs={"mode":"NUMBA"})
+    )
+
+```

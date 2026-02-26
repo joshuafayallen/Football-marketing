@@ -12,3 +12,6 @@ modeling-scripts/mock-blog-post_files
 .vdoc.*
 *.DS_Store
 *.csv
+*.nc
+mock-blog-post_files
+processed-data/processed-dat.parquet

@@ -112,7 +112,6 @@ with pm.Model(coords = coords) as mock_orderd_beta:
     # -- Random region intercepts  (1|region) ----------------------------
     sigma_region = pm.Exponential('region_sigma', 1)
 
-# With non-centred parameterisation:
     region_offset_raw = pm.Normal("region_offset_raw", mu=0, sigma=1, dims="regions")
     region_offset = pm.Deterministic(
     "region_offset", region_offset_raw * sigma_region, dims="regions"
@@ -180,6 +179,15 @@ summary_vars = [
     "region_sigma", "log_phi",
     "cutpoint_0", "cutpoint_gap", "cutpoint_1",
 ]
-summ  = az.summary(check_ordered_beta, hdi_prob=0.95, var_names=summary_vars)
 
-summ
+
+with pm.Model() as mock_beta2:
+    
+    cutpoint_1 = pm.Normal('cutpoint_1', mu = 0, sigma = 1)
+    cutpoint_gap = pm.Normal('cutpoint_gap', mu = 0, sigma = 3)
+    cutpoint_2 = pm.Deterministic('cutpoint_2',
+                                    cutpoint_1 + pt.exp(cutpoint_gap))
+
+
+    
+    
