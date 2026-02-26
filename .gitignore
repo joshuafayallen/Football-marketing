@@ -13,5 +13,6 @@ modeling-scripts/mock-blog-post_files
 *.DS_Store
 *.csv
 *.nc
+*.parquet
 mock-blog-post_files
 processed-data/processed-dat.parquet
