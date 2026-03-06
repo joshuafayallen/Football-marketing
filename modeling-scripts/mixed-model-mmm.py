@@ -558,13 +558,20 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
                                 sigma = 1,
                                 dims = 'play_callers')
     
-    w_coach_logit = pm.Deterministic(
-        'w_coach_logit', 
+    w_coach_logit_base = pm.Deterministic(
+        'w_coach_logit_base', 
         w_mu + w_sig * w_coach_offset,
         dims = 'play_callers'
     )
 
-    w_zeros = pm.math.invlogit(w_coach_logit[coach_idx])
+    w_coach_logit = pm.Deterministic(
+        'w_coach_logit', 
+         w_coach_logit_base[coach_idx]
+        + (pm.math.dot(passing_prior, passing_dat)),
+        dims = 'obs_id'
+    )
+
+    w_zeros = pm.math.invlogit(w_coach_logit)
 
     w_beta_obs = 1 - w_zeros
 
@@ -579,11 +586,6 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
 
     beta_dist = pm.Beta.dist(alpha=mu_logit * precision,
                             beta = (1-mu_logit) * precision)
-    pm.Mixture('y_obs',
-                    w=w_obs, 
-                    comp_dists=[zero_spike, 
-                                beta_dist], 
-                    observed=obs_exp_plays)
 
     pm.Mixture('y_obs',
                     w=w_obs, 
