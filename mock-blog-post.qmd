@@ -1361,8 +1361,8 @@ with mmm_hsgp:
 
     pm.Beta(
         'y_obs', 
-        mu = mu_logit, 
-        nu = precision,
+        alpha = mu_logit * precision, 
+        beta = (1-mu_logit) * precision,
         observed = obs_exp_plays,
         dims = 'obs_id')
 
@@ -1431,6 +1431,7 @@ The final and perhaps most important thing is to check how well the model fits t
 
 
 ```{python}
+#| label: fig-ppc-simple-beta
 az.plot_ppc(idata)
 ```
 
@@ -1439,6 +1440,7 @@ In this case the model does an okay job at fitting the underlying data but we mi
 
 ```{python}
 #| code-fold: true
+#| label: fig-shanny-mmm
 post = idata['posterior']
 
 shanny_mean = post['coach_mean_raw'].sel(play_callers = 'Kyle Shanahan')
@@ -1493,4 +1495,302 @@ The other thing that can be said is that we don't really have a ton of data for 
 
 ### Refining the model 
 
-Through lots of fiddling I found that the only real way to improve the fit of the model is to build a mixture model. 
+Through lots of fiddling I found that the only real way to improve the fit of the model is change the likelihood. The first thing I tried, since I have never worked with one, was a mixture model. The main idea is that populations are, generally, made up of a lot of different kinds of groups. For example, if we plotted all the heights in the NFL we would get something that looks pretty close to a Gaussian distribution. However, we know that there are generally different height thresholds that teams stick to for each position group. Consequently the overall distribution of heights in the NFL is just a mixture of the smaller distributions of heights in position groups. 
+
+
+```{python}
+#| echo: false
+heights = nfl.load_rosters()
+fig, axe = plt.subplots()
+sns.kdeplot(heights, x = 'height', alpha = 0.5)
+sns.kdeplot(heights, x = 'height', hue = 'position')
+
+```
+
+We can use this idea to either model these distributions, essentially, creating a bunch of component Gaussian distributions with a different mean and maybe a different standard deviation. Then we are going to model each of those components and combine them at the end. The way it does this is by adding a weight to each of these component parts to tell the model where they are likely to belong. Mixture models are not neccessarily limited to models with distinct sub-populations. We can use these models to give us flexibililty for bimodal distributions, phenomena where we have lots of zeros or ones, and a whole host of other things. 
+
+For example, if we wanted to model whether a player is likely to be drafted in the first round and then their projected value as a first round pick we would want to build a hurdle model. We can think of a hurdle model as a mixture model with a particular structure where we are modeling whether they are above some threshold and then modeling another data generating process. So in our example the hurdle model is going to estimate the probability they would be picked in the first round. The model that handles whether they were a first rounder would be a simple binary classifier where we including variables like college production, their measurables, some observable measure of their character, and quality of their competition. The next part of the model would then just model expected value of the pick. Mixture models give us lots of ways to build in flexibility into our models. 
+
+In our case, there are a bunch of different dynamics that could lead to an offense having no explosive plays in a game. Additionally, player availability during the season could cause bimodality in the data that we aren't modeling. We saw in @fig-ppc-simple-beta that there were lots of peaks and valleys as well as lots of bunching closer to zero.^[Undoubtedly this partially because of our clipping procedure.] By using a mixture model we can try to handle some of the quirks of this data by divinding the model a few different ways. 
+
+The first way I tried was to keep passes and rushes together and then try to separate the games with low explosive plays. This could be some combination of a bad game, terrible weather, or the defense playing an insane game that could explain low explosive play production. Just as likely is that over the course of the NFL season players are going to get hurt. This is going to have big impacts as the you dip into offensive line depth or your third wide receiver is now getting all the targets that would be going to your WR 1. There are also things that can vault you into the middle of the distribution like a rookie WR finally figuring out how to play in the pros or you are going against an easier stretch of your schedule. 
+
+## Mixtures 
+
+To keep it simple I am just going to focus on the changes that I made to the model. The first thing I did was that I ditched the HSGP for games and then changed the saturation to a Michaelis-Menten saturation which is used more for online campaigns where we expect the decay to set in much more quickly.
+
+
+```{python}
+#| echo: false
+
+coords = {
+    'games': unique_games,
+    'seasons': unique_seasons, 
+    'predictors': just_controls_sdz.drop('avg_pass_rate',axis = 1).columns.tolist(), 
+    'channels': personnel_scaled.columns,
+    'play_callers': unique_play_callers,
+    'obs_id': just_controls_sdz.index
+}
+
+def logit(p):
+    return np.log(p / (1 - p))
+
+
+with pm.Model(coords = coords) as mmm_mix_adapt: 
+
+    global_controls = pm.Data(
+        'control_data', just_controls_sdz.drop('avg_pass_rate', axis = 1),
+                        dims = ('obs_id', 'predictors')
+    )
+
+    passing_dat = pm.Data('passing_data',
+                            just_controls_sdz['avg_pass_rate'],
+                            dims = 'obs_id')
+
+    personnel_dat = pm.Data(
+        'personel_data', personnel_scaled, dims = ('obs_id','channels')
+    )
+
+    season_data = pm.Data('season_id', season_idx, dims = 'obs_id')
+
+    x_seasons = pm.Data('x_seasons', unique_seasons, dims = 'seasons')[:,None]
+
+    obs_exp_plays = pm.Data('obs_exp_plays',
+                            scaled_y['explosive_play_rate_transformed'].to_numpy(),
+                            dims = 'obs_id')
+
+
+    gps_sigma = pm.Exponential('gps_sigma', 2)
+
+    ls = pm.InverseGamma('ls',
+                        alpha = between_season_gp.alpha,
+                        beta = between_season_gp.beta)
+
+
+    cov_coach_evo = gps_sigma**2*pm.gp.cov.Matern52(input_dim=1, ls = ls)
+
+    gp_coach_evo = pm.gp.HSGP(m = [between_season_m],
+                            c = between_season_c,
+                            cov_func=cov_coach_evo)
+
+
+    coach_evolution = gp_coach_evo.prior('coach_evolution',
+                                            X = x_seasons,
+                                            dims = 'seasons')
+
+    coach_mean_raw = pm.Normal('coach_mean_raw',
+                                mu = logit(0.3),
+                                sigma = 0.2,
+                                dims = 'play_callers')
+
+    coach_mu = pm.Deterministic('coach_mu', 
+                                coach_mean_raw[coach_idx] + 
+                                coach_evolution[season_idx],
+                                dims = 'obs_id')
+
+                                
+
+    adstock_alphas = pm.Beta('adstock_alphas',
+                                alpha = 1,
+                                beta = 8, dims = 'channels')
+
+    controls_beta = pm.Normal('controls_beta', mu=0, sigma= 0.05,
+    dims='predictors')
+
+    control_contribution = pm.Deterministic(
+        'control_contribution', 
+        pm.math.dot(global_controls, controls_beta), 
+        dims='obs_id'
+
+    )
+
+    adstock_list = []
+    
+
+    for i in range(len(coords['channels'])):
+        cols = personnel_dat[:,i]
+        adstock_list.append(geometric_adstock(cols, adstock_alphas[i],
+                            l_max = 2))
+
+    x_adstock = pt.stack(adstock_list, axis = 1)
+
+    mm_alpha = pm.Gamma('mm_alpha', alpha=2, beta=4, dims='channels')   
+    mm_lam = pm.Gamma('mm_lam', alpha=2, beta=10, dims='channels')  
+
+
+    saturated_list = []
+
+    for i in range(len(coords['channels'])):
+
+        saturated_list.append(
+        michaelis_menten(x_adstock[:, i], mm_alpha[i], mm_lam[i]))
+
+    x_saturated = pt.stack(saturated_list, axis=1)
+
+
+    personnel_contribution = pm.Deterministic(
+    'personnel_contribution',
+    x_saturated.sum(axis=1),  # mm_alpha handles magnitude per channel
+    dims='obs_id')
+    passing_prior = pm.Normal('passing_prior', mu = 0, sigma = 0.1)
+
+
+
+    mu = pm.Deterministic('mu',
+        coach_mu +  
+        personnel_contribution +  
+        control_contribution + 
+        (pm.math.dot(passing_prior, passing_dat)),      
+        dims='obs_id'
+    )
+
+
+    mu_logit = pm.math.invlogit(mu)
+    # like 1/25 plays is explosive
+    precision = pm.Exponential('precision', 1/20)
+    w_mu = pm.Normal('w_mu', mu = 0, sigma = 0.5)
+    w_sig = pm.HalfNormal('w_sig', sigma = 0.3)
+
+    # the offset is probably not huge
+    w_coach_offset = pm.Normal('w_coach_offset',
+                                mu = 0,
+                                sigma = 1,
+                                dims = 'play_callers')
+    
+    w_coach_logit_base = pm.Deterministic(
+        'w_coach_logit_base', 
+        w_mu + w_sig * w_coach_offset,
+        dims = 'play_callers'
+    )
+
+    w_coach_logit = pm.Deterministic(
+        'w_coach_logit', 
+         w_coach_logit_base[coach_idx]
+        + (pm.math.dot(passing_prior, passing_dat)),
+        dims = 'obs_id'
+    )
+
+    w_zeros = pm.math.invlogit(w_coach_logit)
+
+    w_beta_obs = 1 - w_zeros
+
+    w_obs = pm.Deterministic(
+        'w_obs',
+        pt.stack([w_zeros, w_beta_obs], axis = 1)
+    )
+    lower_bound = 0.5 / len(scaled_y)
+    upper_bound = 1 - 0.5 / len(scaled_y)
+
+    zero_spike = pm.Uniform.dist(lower = 0, upper=lower_bound * 10)
+
+    beta_dist = pm.Beta.dist(alpha=mu_logit * precision,
+                            beta = (1-mu_logit) * precision)
+    
+    pm.Mixture('y_obs',
+                    w=w_obs, 
+                    comp_dists=[zero_spike, 
+                                beta_dist], 
+                    observed=obs_exp_plays
+
+
+
+
+```
+
+
+
+```{python}
+#| eval: false
+
+with pm.Model(coords = coords) as mmm_examp: 
+    adstock_list = []
+    for i in range(len(coords['channels'])):
+        cols = personnel_dat[:,i]
+        adstock_list.append(geometric_adstock(cols, adstock_alphas[i],
+                            l_max = 2))
+
+    x_adstock = pt.stack(adstock_list, axis = 1)
+
+    mm_alpha = pm.Gamma('mm_alpha', alpha=2, beta=4, dims='channels')   
+    mm_lam = pm.Gamma('mm_lam', alpha=2, beta=10, dims='channels')  
+    saturated_list = []
+
+    for i in range(len(coords['channels'])):
+
+        saturated_list.append(
+        michaelis_menten(x_adstock[:, i], mm_alpha[i], mm_lam[i]))
+
+    x_saturated = pt.stack(saturated_list, axis=1)
+
+    personnel_contribution = pm.Deterministic(
+    'personnel_contribution',
+    x_saturated.sum(axis=1),  # mm_alpha handles magnitude per channel
+    dims='obs_id')
+
+
+
+```
+
+The next thing that I changed was just getting rid of the week to week HSGP.^[That is an excercise left to the reader.] The most important part is to define the mixture part. 
+
+
+
+```{python}
+
+with mmm_examp:
+    # set hyper priors for cutpoints 
+
+    w_mu = pm.Normal('w_mu', mu = 0, sigma = 0.5)
+    w_sig = pm.HalfNormal('w_sig', sigma = 0.3)
+
+    # the offset is probably not huge
+    w_coach_offset = pm.Normal('w_coach_offset',
+                                mu = 0,
+                                sigma = 1,
+                                dims = 'play_callers')
+    
+    w_coach_logit = pm.Deterministic(
+        'w_coach_logit', 
+        w_mu + w_sig * w_coach_offset,
+        dims = 'play_callers'
+    )
+
+    w_zeros = pm.math.invlogit(w_coach_logit[coach_idx])
+
+    w_beta_obs = 1 - w_zeros
+
+    w_obs = pm.Deterministic(
+        'w_obs',
+        pt.stack([w_zeros, w_beta_obs], axis = 1)
+    )
+    lower_bound = 0.5 / len(scaled_y)
+    upper_bound = 1 - 0.5 / len(scaled_y)
+
+    zero_spike = pm.Uniform.dist(lower = 0, upper=lower_bound * 10)
+
+    beta_dist = pm.Beta.dist(alpha=mu_logit * precision,
+                            beta = (1-mu_logit) * precision)
+    pm.Mixture('y_obs',
+                    w=w_obs, 
+                    comp_dists=[zero_spike, 
+                                beta_dist], 
+                    observed=obs_exp_plays)
+
+```
+
+Here we are going to try to learn whether each coach is in near zero play regime. We could really make this complicated by adding more and more covariates to our `w_coach_logit` param. Instead I just used a passing rate to keep it kind of simple. 
+
+
+```{python}
+
+with mmm_mix_adapt:
+    idata = pm.sample(random_seed=RANDOM_SEED, nuts_sampler='numpyro')
+
+with mmm_mix_adapt:
+    idata.extend(
+        pm.sample_posterior_predictive(idata)
+    )
+
+az.plot_ppc(idata)
+
+```

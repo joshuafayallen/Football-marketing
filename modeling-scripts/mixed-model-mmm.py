@@ -434,7 +434,6 @@ idata_mix.to_netcdf('model/mmm-mix-fixed-cutpoints.nc')
 
 
 with pm.Model(coords = coords) as mmm_mix_adapt: 
-
     global_controls = pm.Data(
         'control_data', just_controls_sdz.drop('avg_pass_rate', axis = 1),
                         dims = ('obs_id', 'predictors')
@@ -545,10 +544,6 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
     mu_logit = pm.math.invlogit(mu)
     # like 1/25 plays is explosive
     precision = pm.Exponential('precision', 1/20)
-    #precision = pm.Gamma('precision', alpha = 10, beta = 0.5)
-
-    # set hyper priors for cutpoints 
-
     w_mu = pm.Normal('w_mu', mu = 0, sigma = 0.5)
     w_sig = pm.HalfNormal('w_sig', sigma = 0.3)
 
@@ -566,7 +561,7 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
 
     w_coach_logit = pm.Deterministic(
         'w_coach_logit', 
-         w_coach_logit_base[coach_idx]
+        w_coach_logit_base[coach_idx]
         + (pm.math.dot(passing_prior, passing_dat)),
         dims = 'obs_id'
     )
@@ -586,18 +581,20 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
 
     beta_dist = pm.Beta.dist(alpha=mu_logit * precision,
                             beta = (1-mu_logit) * precision)
-
+    
     pm.Mixture('y_obs',
                     w=w_obs, 
                     comp_dists=[zero_spike, 
                                 beta_dist], 
-                    observed=obs_exp_plays)
-
+                    observed=obs_exp_plays,
+                    dims = 'obs_id')
 
 
 with mmm_mix_adapt:
     idata_adapt_mix = pm.sample_prior_predictive()
 
+
+idata_adapt_mix
 
 az.plot_ppc(idata_adapt_mix, group = 'prior', observed = True)
 
@@ -609,10 +606,12 @@ with mmm_mix_adapt:
 
 
 with mmm_mix_adapt:
-    pm.compute_log_likelihood(idata_adapt_mix)
     idata_adapt_mix.extend(
         pm.sample_posterior_predictive(idata_adapt_mix)
     )
+
+
+
 
 
 idata_adapt_mix.to_netcdf(
