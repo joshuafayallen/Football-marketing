@@ -561,8 +561,7 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
 
     w_coach_logit = pm.Deterministic(
         'w_coach_logit', 
-        w_coach_logit_base[coach_idx]
-        + (pm.math.dot(passing_prior, passing_dat)),
+        w_coach_logit_base[coach_idx],
         dims = 'obs_id'
     )
 
@@ -593,8 +592,6 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
 with mmm_mix_adapt:
     idata_adapt_mix = pm.sample_prior_predictive()
 
-
-idata_adapt_mix
 
 az.plot_ppc(idata_adapt_mix, group = 'prior', observed = True)
 

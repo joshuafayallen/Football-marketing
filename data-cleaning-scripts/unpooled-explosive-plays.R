@@ -26,11 +26,6 @@ play_callers = read_csv(
   mutate(play_caller_tenure = season - play_caller_mins)
 
 
-play_callers |>
-  filter(team == 'KC', season >= 2017) |>
-  filter_out(off_play_caller == 'Andy Reid')
-
-
 add_play_callers = df |>
   left_join(
     play_callers,
@@ -80,7 +75,7 @@ make_features = add_play_callers |>
     ),
     is_pass = ifelse(play_type_nfl == 'PASS', 1, 0)
   ) |>
-  group_by(season, nflverse_game_id, off_play_caller) |>
+  group_by(season, nflverse_game_id, off_play_caller, play_type_nfl) |>
   summarise(
     success_rate = mean(success, na.rm = TRUE),
     explosive_play_rate = mean(is_explosive, na.rm = TRUE),
@@ -180,39 +175,7 @@ cleaned_data = make_snap_shares |>
   filter_out(is.na(off_play_caller))
 
 
-arrow::write_parquet(cleaned_data, 'processed-data/processed-dat.parquet')
-
-
-mean(df$defenders_in_box, na.rm = TRUE)
-
-plot_shares_time = cleaned_data |>
-  pivot_longer(
-    starts_with('personnel')
-  )
-
-
-check = plot_shares_time |>
-  filter(off_play_caller == 'Kyle Shanahan') |>
-  mutate(
-    week = str_extract(nflverse_game_id, '_\\d{2}_'),
-    week = as.factor(str_remove_all(week, '_'))
-  ) |>
-  filter(value > 0)
-
-
-ggplot(check, aes(x = week, y = value, fill = name)) +
-  geom_col(position = 'dodge') +
-  scale_fill_met_d(name = 'Demuth') +
-  facet_wrap(vars(season))
-
-
-check |>
-  group_by(name) |>
-  summarise(mean(value))
-
-
-add_play_callers |>
-  filter(season == 2025)
-
-check = play_callers |>
-  filter(season == 2025)
+arrow::write_parquet(
+  cleaned_data,
+  'processed-data/explosives-separated.parquet'
+)
