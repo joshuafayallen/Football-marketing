@@ -126,7 +126,7 @@ scaled_y = (
 
 )
 
-scaled_y['scaled_explosive_plays'].max()
+
 
 
 get_stds = (
@@ -232,34 +232,18 @@ personnel_scaled = (
 
 
 
-in_season_gp, _ =  pz.maxent(pz.InverseGamma(), 2, 4)
-
-
-
-in_season_m, in_season_c = pm.gp.hsgp_approx.approx_hsgp_hyperparams(
-
-    x_range=[
-        unique_games.min(), unique_games.max()
-    ], 
-
-    lengthscale_range=[2,4], 
-    cov_func='matern52'
-
-)
-
-
-
-between_season_gp, _ = pz.maxent(pz.InverseGamma(), 2, 5)
+between_season_gp, _ = pz.maxent(pz.InverseGamma(), 2, 3)
 
 
 between_season_m, between_season_c = pm.gp.hsgp_approx.approx_hsgp_hyperparams(
     x_range = [unique_seasons.min(), unique_seasons.max()],
-    lengthscale_range=[2,5],
+    lengthscale_range=[2,3],
     cov_func='matern52'
 
 )
 
-
+def logit(p):
+    return np.log(p / (1 - p))
 
 coords = {
     'games': unique_games,
@@ -268,16 +252,14 @@ coords = {
     'channels': personnel_scaled.columns,
     'play_callers': unique_play_callers,
     'obs_id': just_controls_sdz.index, 
-    'time_scale': ['game', 'season']
 }
 
-def logit(p):
-    return np.log(p / (1 - p))
+
+scaled_y['explosive_play_rate_transformed'].median()
 
 
 
-with pm.Model(coords = coords) as mmm_hsgp: 
-
+with pm.Model(coords = coords) as sans_games_mm:
     global_controls = pm.Data(
         'control_data', just_controls_sdz.drop('avg_pass_rate', axis = 1),
                         dims = ('obs_id', 'predictors')
@@ -293,58 +275,39 @@ with pm.Model(coords = coords) as mmm_hsgp:
 
     season_data = pm.Data('season_id', season_idx, dims = 'obs_id')
 
-    game_data = pm.Data('game_id', games_idx, dims = 'obs_id' )
-
     x_seasons = pm.Data('x_seasons', unique_seasons, dims = 'seasons')[:,None]
-
-    x_games = pm.Data('x_games', unique_games, dims = 'games')[:, None]
 
     obs_exp_plays = pm.Data('obs_exp_plays',
                             scaled_y['explosive_play_rate_transformed'].to_numpy(),
                             dims = 'obs_id')
 
-    #
-    gps_sigma = pm.Exponential('gps_sigma', 10, dims='time_scale')
+
+    gps_sigma = pm.Exponential('gps_sigma', 2)
 
     ls = pm.InverseGamma('ls',
-                        alpha = np.array([in_season_gp.alpha,
-                                        between_season_gp.alpha]),
-                        beta = np.array([in_season_gp.beta,
-                                        between_season_gp.beta]),
-                        dims='time_scale')
+                        alpha = between_season_gp.alpha,
+                        beta = between_season_gp.beta)
 
 
-    cov_coach_evo = gps_sigma[0]**2*pm.gp.cov.Matern52(input_dim=1, ls = ls[0])
-
-    cov_game_evo = gps_sigma[1]**2*pm.gp.cov.Matern52(input_dim=1, ls = ls[1])
-
+    cov_coach_evo = gps_sigma**2*pm.gp.cov.Matern52(input_dim=1, ls = ls)
 
     gp_coach_evo = pm.gp.HSGP(m = [between_season_m],
                             c = between_season_c,
                             cov_func=cov_coach_evo)
 
-    gp_game_evo = pm.gp.HSGP(m = [in_season_m],
-                            c = in_season_c,
-                            cov_func=cov_game_evo)
 
     coach_evolution = gp_coach_evo.prior('coach_evolution',
                                             X = x_seasons,
                                             dims = 'seasons')
 
-
-    game_evolution = gp_game_evo.prior('game_evolution',
-                                        X = x_games,
-                                        dims = 'games')
-
     coach_mean_raw = pm.Normal('coach_mean_raw',
-                                mu = logit(obs_exp_plays.mean()),
-                                sigma = 0.5,
+                                mu = logit(0.3),
+                                sigma = 0.2,
                                 dims = 'play_callers')
 
     coach_mu = pm.Deterministic('coach_mu', 
                                 coach_mean_raw[coach_idx] + 
-                                coach_evolution[season_idx] +
-                                game_evolution[games_idx],
+                                coach_evolution[season_idx],
                                 dims = 'obs_id')
 
                                 
@@ -352,8 +315,6 @@ with pm.Model(coords = coords) as mmm_hsgp:
     adstock_alphas = pm.Beta('adstock_alphas',
                                 alpha = 1,
                                 beta = 8, dims = 'channels')
-
-
 
     controls_beta = pm.Normal('controls_beta', mu=0, sigma= 0.05,
     dims='predictors')
@@ -366,6 +327,7 @@ with pm.Model(coords = coords) as mmm_hsgp:
     )
 
     adstock_list = []
+    
 
     for i in range(len(coords['channels'])):
         cols = personnel_dat[:,i]
@@ -374,33 +336,25 @@ with pm.Model(coords = coords) as mmm_hsgp:
 
     x_adstock = pt.stack(adstock_list, axis = 1)
 
-    channel_betas = pm.Normal('channel_betas', mu = 0, sigma = 0.5,
-                                dims = 'channels')
+    mm_alpha = pm.Gamma('mm_alpha', alpha=2, beta=4, dims='channels')   
+    mm_lam = pm.Gamma('mm_lam', alpha=2, beta=10, dims='channels')  
 
-    saturation_lam = pm.Gamma('saturation_lamda',
-                                                alpha = 3,
-                                                beta = 0.5, dims = 'channels')
 
-    saturation_slope = pm.LogNormal('saturation_slope',
-                                        mu = 0,
-                                        sigma = 0.2, 
-                                        dims = 'channels')
-    # effectivelly logistic saturation
-    x_saturated = pm.Deterministic(
-                'x_saturated',
-                ((1-pm.math.exp(-saturation_lam * x_adstock)) / 
-                (1 + pm.math.exp(-saturation_lam * x_adstock))),
-                dims = ('obs_id', 'channels'))
+    saturated_list = []
+
+    for i in range(len(coords['channels'])):
+
+        saturated_list.append(
+        michaelis_menten(x_adstock[:, i], mm_alpha[i], mm_lam[i]))
+
+    x_saturated = pt.stack(saturated_list, axis=1)
 
 
     personnel_contribution = pm.Deterministic(
-        'personnel_contribution', 
-        pm.math.dot(x_saturated, channel_betas),
-        dims = 'obs_id'
-
-    )
-
-    passing_prior = pm.Normal('passing_prior', mu = 0, sigma = 0.5)
+    'personnel_contribution',
+    x_saturated.sum(axis=1),  # mm_alpha handles magnitude per channel
+    dims='obs_id')
+    passing_prior = pm.Normal('passing_prior', mu = 0, sigma = 0.1)
 
 
 
@@ -412,10 +366,10 @@ with pm.Model(coords = coords) as mmm_hsgp:
         dims='obs_id'
     )
     # like 1/25 plays is explosive
-    precision = pm.Exponential('precision', 1/20)
-    #precision  = pm.Gamma('precision', alpha = 10, beta = 1)
+    #precision = pm.Exponential('precision', 1/15)
+    precision = pm.Gamma('precision', alpha = 10, beta = 0.5)
     mu_logit = pm.math.invlogit(mu)
-  
+
 
     pm.Beta(
         'y_obs', 
@@ -423,88 +377,30 @@ with pm.Model(coords = coords) as mmm_hsgp:
         beta = (1-mu_logit) * precision,
         observed = obs_exp_plays,
         dims = 'obs_id')
+    
 
 
-with mmm_hsgp:
-    idata = pm.sample_prior_predictive()
 
-az.plot_ppc(idata, group = 'prior', observed=True)
+with sans_games_mm:
+    idata_mm = pm.sample_prior_predictive()
 
 
-with mmm_hsgp:
-    idata.extend(
+az.plot_ppc(idata_mm, group = 'prior', observed = True)
+
+
+with sans_games_mm:
+    idata_mm.extend(
         pm.sample(
-            random_seed=RANDOM_SEED, nuts_sampler = 'numpyro'
+            random_seed=RANDOM_SEED, nuts_sampler='numpyro', progressbar=True
         )
     )
 
 
-with mmm_hsgp: 
-    pm.compute_log_likelihood(idata)
-    idata.extend(
-        pm.sample_posterior_predictive(idata),
+with sans_games_mm:
+    idata_mm.extend(
+        pm.sample_posterior_predictive(idata_mm)
     )
 
-az.plot_ppc(idata)
-
-
-idata.to_netcdf('model/mmm-beta.nc')
-
-plt.title('Regular Beta')
-
-
-post = idata['posterior']
-
-shanny_mean = post['coach_mean_raw'].sel(play_callers = 'Kyle Shanahan')
-
-shanny_idx = list(coords['play_callers']).index('Kyle Shanahan')
-shanny_mask = coach_idx == shanny_idx
-
-shanahan_obs = np.where(shanny_mask)[0]
-base = post["coach_mu"].isel(obs_id=shanahan_obs).mean(dim=["chain", "draw"]).values
-per_channel = (post["x_saturated"].isel(obs_id=shanahan_obs) * post["channel_betas"]).mean(dim=["chain", "draw"]).values  
-controls    = post["control_contribution"].isel(obs_id=shanahan_obs).mean(dim=["chain", "draw"]).values
-base_layer     = expit(base)
-channel_layers = []
-cumulative     = base.copy()
-
-for i in range(len(coords["channels"])):
-    cumulative = cumulative + per_channel[:, i]
-    channel_layers.append(expit(cumulative))
-
-observed = scaled_y["explosive_play_rate_transformed"].to_numpy()[shanny_mask]
-games   = np.arange(len(shanahan_obs))  
-
-fig, ax = plt.subplots(figsize=(14, 6))
-
-colors = plt.cm.tab10.colors
-
-ax.fill_between(games, 0, base_layer, color="gray", alpha=0.8, label="Base")
-
-prev_layer = base_layer.copy()
-for i, channel in enumerate(coords["channels"]):
-    ax.fill_between(games, prev_layer, channel_layers[i],
-                    color=colors[i], alpha=0.8, label=channel)
-    prev_layer = channel_layers[i]
-
-ax.plot(games, observed, color="black", linewidth=1, label="Observed")
-
-ax.set_title("Personnel Contribution Breakdown — Kyle Shanahan")
-ax.set_xlabel("Game")
-ax.set_ylabel("Explosive Play Rate")
-ax.set_ylim(0, 1)  # probability scale
-ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
-plt.tight_layout()
-plt.show()
-## vanishingly small contribution 
-
-az.plot_posterior(idata, var_names=["channel_betas", "saturation_lamda", "saturation_slope"])
-
-x_sat_vals = post["x_saturated"].mean(dim=["chain","draw"]).values  # (obs, channels)
-for i, ch in enumerate(coords["channels"]):
-    print(f"{ch}: min={x_sat_vals[:,i].min():.3f}, max={x_sat_vals[:,i].max():.3f}, std={x_sat_vals[:,i].std():.3f}")
-
-
-
+az.plot_ppc(idata_mm)
 
 

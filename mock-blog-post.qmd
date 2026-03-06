@@ -485,7 +485,7 @@ So the entire crux of MMMs is that we don't expect ads: to work instantly, every
 
 ### Adstock
 
-Adstock really just refers to the decay rate. So if I run an advertisement how quickly do those effects diminsh overtime. Adstock is typically conceptualized as a ratio where  . Typically adstock is constrained to be between zero and 1 so the Beta distribution is used more often than not. A vagueish prior would be a $adstock \sim \beta(\alpha = 1, \beta = 3)$ or something that looks like this 
+Adstock really just refers to the decay rate. So if I run an advertisement how quickly do those effects diminsh overtime. Typically adstock is constrained to be between zero and 1 so the Beta distribution is used more often than not. A vagueish prior would be a $adstock \sim \beta(\alpha = 1, \beta = 3)$ or something that looks like this 
 
 ```{python}
 fig, axe = plt.subplots()
@@ -1198,7 +1198,7 @@ sns.histplot(data = scaled_y, x = 'explosive_play_rate_transformed')
 
 To handle this I nudged the values of explosive play rate away from zero and one. There are definetly drawbacks to this approach as outlined in [Kubinec 2023](https://www.cambridge.org/core/journals/political-analysis/article/abs/ordered-beta-regression-a-parsimonious-wellfitting-model-for-continuous-data-with-lower-and-upper-bounds/89F4141DA16D4FC217809B5EB45EEE83), but we are still working on a native PyMC implementation. 
 
-## The Model 
+## Modeling the data 
 
 We are going to build the model bit by bit. Just so `PyMC` does not get mad at me we are going to define the data first. 
 
@@ -1386,3 +1386,111 @@ with mmm_hsgp:
     )
 
 ```
+
+
+As with Bayesian Models lets go and check the health of the model. Since we have quite a few parameters we are just going to loop through each of the variables and create the trace plots. 
+
+
+```{python}
+#| code-fold: true
+vars = list(idata.posterior.data_vars)
+chunks = [vars[i:i + 5] for i in range(0, len(vars) , 5)]
+    
+```
+
+
+Overall it looks like these parameters are sampling well
+
+```{python}
+#| echo: false
+az.plot_trace(idata, var_names=chunks[0], compact=True)
+
+```
+
+
+Lets look at the personnel contributions, control contributions, and our mu parameter. Again these are looking good. 
+
+
+```{python}
+#| echo: false
+az.plot_trace(idata, var_names=chunks[3], compact = True)
+```
+
+
+To save the trouble of looking through every single parameter we can kind of just peek at whether the model explores the posterior well. As we can see the model looks 
+
+
+```{python}
+#| echo: false
+az.plot_energy(idata)
+
+```
+
+
+The final and perhaps most important thing is to check how well the model fits the underlying data. 
+
+
+```{python}
+az.plot_ppc(idata)
+```
+
+In this case the model does an okay job at fitting the underlying data but we miss a lot of the interesting shapes and bumps in the observed data. Lets just look at the contributions per channel. 
+
+
+```{python}
+#| code-fold: true
+post = idata['posterior']
+
+shanny_mean = post['coach_mean_raw'].sel(play_callers = 'Kyle Shanahan')
+
+shanny_idx = list(coords['play_callers']).index('Kyle Shanahan')
+shanny_mask = coach_idx == shanny_idx
+
+shanahan_obs = np.where(shanny_mask)[0]
+base = post["coach_mu"].isel(obs_id=shanahan_obs).mean(dim=["chain", "draw"]).values
+per_channel = (
+    post["x_saturated"].isel(obs_id=shanahan_obs) * post["channel_betas"]).mean(dim=["chain", "draw"]
+    ).values  
+controls = post["control_contribution"].isel(obs_id=shanahan_obs).mean(dim=["chain", "draw"]).values
+base_layer = expit(base)
+channel_layers = []
+cumulative = base.copy()
+
+for i in range(len(coords["channels"])):
+    cumulative = cumulative + per_channel[:, i]
+    channel_layers.append(expit(cumulative))
+
+observed = scaled_y["explosive_play_rate_transformed"].to_numpy()[shanny_mask]
+games   = np.arange(len(shanahan_obs))  
+
+fig, ax = plt.subplots(figsize=(14, 6))
+
+colors = plt.cm.tab10.colors
+
+ax.fill_between(games, 0, base_layer, color="gray", alpha=0.8, label="Base")
+
+prev_layer = base_layer.copy()
+for i, channel in enumerate(coords["channels"]):
+    ax.fill_between(games, prev_layer, channel_layers[i],
+                    color=colors[i], alpha=0.8, label=channel)
+    prev_layer = channel_layers[i]
+
+ax.plot(games, observed, color="black", linewidth=1, label="Observed")
+
+ax.set_title("Personnel Contribution Breakdown — Kyle Shanahan")
+ax.set_xlabel("Game")
+ax.set_ylabel("Explosive Play Rate")
+ax.set_ylim(0, 1)  # probability scale
+ax.legend(loc="upper left", bbox_to_anchor=(1, 1))
+plt.tight_layout()
+plt.show()
+
+```
+
+We don't see any appreciable returns for personnel groupings. Obviously this could be true! The design of the play is probably doing than putting an extra tight end on the field. But it could be that the model is not capturing the underlying data well! We have seen that the posterior predictive sort of follows the underlying data. We assumed that the saturation curve was logistic meaning there is some theoretical inflection point where we shouldn't spend any more money on that channel. More games are going to have no explosive plays than be closer to 25% of plays being explosive so the model needs to handle the bunching closer to zero. Additionally, we defined investment in terms of share of plays rather than the number of plays. 
+
+The other thing that can be said is that we don't really have a ton of data for each coach. While Andy Reid has called plays for 18 years we only observe 8 which equates to 144 weeks of data.^[In the latter parts of the 2017 season Andy Reid hands play calling duties to Matt Nagy] This is right around the reccommended amount of data for a reliable MMM. Partially this is because we want the model to learn the features of the data and not have our priors dominate. The other part is that we have a ton of parameters for a kind of small model. For our channel contributions we have around 5 parameters without accounting for hierarcharies and our HSGPs. It may be that we don't need the HSGP for the season because it is eating some of the variation that the channels should be explaining.
+
+### Refining the model 
+
+Through lots of fiddling I found that the only real way to improve the fit of the model is to build a mixture model. 

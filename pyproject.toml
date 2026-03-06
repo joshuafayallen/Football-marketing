@@ -17,6 +17,7 @@ dependencies = [
     "pyarrow>=23.0.0",
     "pymc>=5.27.1",
     "pymc-marketing>=0.17.1",
+    "pytensor>=2.38.1",
     "scikit-learn>=1.8.0",
     "seaborn>=0.13.2",
 ]

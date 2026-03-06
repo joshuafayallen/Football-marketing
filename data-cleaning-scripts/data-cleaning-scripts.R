@@ -23,50 +23,21 @@ play_callers = read_csv(
     play_caller_mins = min(season),
     .by = off_play_caller
   ) |>
-  mutate(play_caller_tenure = season - play_caller_mins) |>
-  filter(
-    off_play_caller %in%
-      c(
-        'Kyle Shanahan',
-        'Sean McVay',
-        'Ben Johnson',
-        'Josh McDaniels',
-        "Matt LaFleur",
-        'Mike McDaniel',
-        "Kevin O'Conell",
-        'Andy Reid',
-        'Liam Coen'
-      )
-  ) |>
-  filter_out(season == 2026)
+  mutate(play_caller_tenure = season - play_caller_mins)
+
+
+play_callers |>
+  filter(team == 'KC', season >= 2017) |>
+  filter_out(off_play_caller == 'Andy Reid')
 
 
 add_play_callers = df |>
   left_join(
     play_callers,
-    join_by(nflverse_game_id == game_id, season, week, possession_team == team)
-  ) |>
-  filter(
-    off_play_caller %in%
-      c(
-        'Kyle Shanahan',
-        'Sean McVay',
-        'Ben Johnson',
-        'Josh McDaniels',
-        "Matt LaFleur",
-        'Mike McDaniel',
-        "Kevin O'Conell",
-        'Andy Reid',
-        'Liam Coen'
-      )
+    join_by(nflverse_game_id == game_id, possession_team == team, season, week)
   )
 
 
-write_csv(add_play_callers, 'raw_data/participation-small.csv')
-
-
-## okay by the eye test this looks a lot better but this
-## we ar missing a ton of snaps?
 make_snap_shares = add_play_callers |>
   mutate(
     n_tes = str_extract(offense_personnel, "\\d+ TE"),
@@ -84,9 +55,12 @@ make_snap_shares = add_play_callers |>
     .by = c(off_play_caller, nflverse_game_id, personnel_grouping)
   ) |>
   mutate(share = (snaps_by_personnel / total_snaps)) |>
-  group_by(personnel_grouping, off_play_caller) |>
-  distinct(nflverse_game_id, .keep_all = TRUE) |>
-  ungroup() |>
+  distinct(
+    nflverse_game_id,
+    personnel_grouping,
+    off_play_caller,
+    .keep_all = TRUE
+  ) |>
   pivot_wider(
     names_from = personnel_grouping,
     values_from = share,
@@ -202,7 +176,8 @@ cleaned_data = make_snap_shares |>
     surface = str_squish(surface),
     across(c(surface, roof), \(x) as.factor(x))
   ) |>
-  select(-home_team)
+  select(-home_team) |>
+  filter_out(is.na(off_play_caller))
 
 
 arrow::write_parquet(cleaned_data, 'processed-data/processed-dat.parquet')
