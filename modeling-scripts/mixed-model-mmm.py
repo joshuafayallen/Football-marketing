@@ -33,12 +33,6 @@ keep_these = (
     ['off_play_caller'].to_list()
 )
 
-check_py = (pl.read_parquet('processed-data/processed-dat.parquet')
-    .group_by('off_play_caller')
-    .agg(
-        pl.len().alias('games_called')
-    )
-)  
 
 
 raw_data = (
@@ -126,17 +120,7 @@ scaled_y = (
 
 )
 
-scaled_y['scaled_explosive_plays'].max()
 
-
-get_stds = (
-    raw_data
-    .group_by('season')
-    .agg(
-        pl.col('explosive_play_rate').std()
-    )
-
-)
 
 
 numeric_cols = (
@@ -622,3 +606,6 @@ plt.close("all")
 
 
 az.plot_energy(idata_adapt_mix)
+
+
+coords

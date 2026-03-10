@@ -1665,8 +1665,7 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
 
     w_coach_logit = pm.Deterministic(
         'w_coach_logit', 
-         w_coach_logit_base[coach_idx]
-        + (pm.math.dot(passing_prior, passing_dat)),
+         w_coach_logit_base[coach_idx],
         dims = 'obs_id'
     )
 
@@ -1690,7 +1689,7 @@ with pm.Model(coords = coords) as mmm_mix_adapt:
                     w=w_obs, 
                     comp_dists=[zero_spike, 
                                 beta_dist], 
-                    observed=obs_exp_plays
+                    observed=obs_exp_plays)
 
 
 
@@ -1736,7 +1735,7 @@ The next thing that I changed was just getting rid of the week to week HSGP.^[Th
 
 
 ```{python}
-
+#| eval: false
 with mmm_examp:
     # set hyper priors for cutpoints 
 
@@ -1778,7 +1777,7 @@ with mmm_examp:
 
 ```
 
-Here we are going to try to learn whether each coach is in near zero play regime. We could really make this complicated by adding more and more covariates to our `w_coach_logit` param. Instead I just used a passing rate to keep it kind of simple. 
+Here we are going to try to learn whether each coach is in near zero play regime. We could really make this complicated by adding more and more covariates to our `w_coach_logit` param. However, just using the baseline for each coach gets us pretty close. The posterior predicitive follows our observed data a lot better. 
 
 
 ```{python}
@@ -1794,3 +1793,5 @@ with mmm_mix_adapt:
 az.plot_ppc(idata)
 
 ```
+
+Instead of trying to tune this model within an inch of its life it is probably just going to be easier to build a mixture model where we are learning explosive play rate for passes and rushing separtely. 

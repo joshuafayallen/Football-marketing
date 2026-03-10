@@ -6,8 +6,10 @@ df = load_participation(
   seasons = c(2017:2025),
   include_pbp = TRUE
 ) |>
-  filter(play_type_nfl %in% c('PASS', 'RUSH'), season_type == 'REG')
+  filter(play_type %in% c('pass', 'run'), season_type == 'REG')
 
+
+df$play_type |> table()
 
 play_callers = read_csv(
   "https://raw.githubusercontent.com/samhoppen/NFL_public/refs/heads/main/data/all_playcallers.csv"
@@ -44,23 +46,32 @@ make_snap_shares = add_play_callers |>
     n_rbs = as.character(n_rbs + n_fbs),
     personnel_grouping = as.factor(str_glue("personnel_{n_rbs}{n_tes}"))
   ) |>
-  mutate(total_snaps = n(), .by = c(off_play_caller, nflverse_game_id)) |>
+  mutate(
+    total_snaps = n(),
+    .by = c(off_play_caller, nflverse_game_id, play_type)
+  ) |>
   mutate(
     snaps_by_personnel = n(),
-    .by = c(off_play_caller, nflverse_game_id, personnel_grouping)
+    .by = c(
+      off_play_caller,
+      nflverse_game_id,
+      personnel_grouping,
+      play_type
+    )
   ) |>
   mutate(share = (snaps_by_personnel / total_snaps)) |>
   distinct(
     nflverse_game_id,
     personnel_grouping,
     off_play_caller,
+    play_type,
     .keep_all = TRUE
   ) |>
   pivot_wider(
     names_from = personnel_grouping,
     values_from = share,
     values_fill = 0,
-    id_cols = c(nflverse_game_id, off_play_caller)
+    id_cols = c(nflverse_game_id, off_play_caller, play_type)
   )
 
 
@@ -69,19 +80,17 @@ make_snap_shares = add_play_callers |>
 make_features = add_play_callers |>
   mutate(
     is_explosive = case_when(
-      play_type_nfl == 'RUN' & rushing_yards >= 10 ~ 1,
-      play_type_nfl == 'PASS' & receiving_yards >= 20 ~ 1,
+      play_type == 'run' & yards_gained >= 10 ~ 1,
+      play_type == 'pass' & yards_gained >= 20 ~ 1,
       .default = 0
-    ),
-    is_pass = ifelse(play_type_nfl == 'PASS', 1, 0)
+    )
   ) |>
-  group_by(season, nflverse_game_id, off_play_caller, play_type_nfl) |>
+  group_by(season, nflverse_game_id, off_play_caller, play_type) |>
   summarise(
     success_rate = mean(success, na.rm = TRUE),
     explosive_play_rate = mean(is_explosive, na.rm = TRUE),
     avg_epa = mean(epa, na.rm = TRUE),
-    avg_defenders_in_box = mean(defenders_in_box, na.rm = TRUE),
-    avg_pass_rate = mean(is_pass)
+    avg_defenders_in_box = mean(defenders_in_box, na.rm = TRUE)
   ) |>
   ungroup()
 
@@ -101,6 +110,7 @@ make_context_vars = add_play_callers |>
     is_home_team = ifelse(possession_team == home_team, 1, 0),
     diff = offense_score - defense_score,
     avg_diff = mean(diff),
+    avg_vegas_wp = mean(vegas_wp),
     .by = c(off_play_caller, nflverse_game_id)
   ) |>
   group_by(off_play_caller) |>
@@ -119,6 +129,9 @@ make_context_vars = add_play_callers |>
     avg_diff,
     off_play_caller,
     play_caller_tenure,
+    spread_line,
+    total_line,
+    avg_vegas_wp, # this is just for the possession team
   ) |>
   ungroup() |>
   mutate(
@@ -135,10 +148,19 @@ make_context_vars = add_play_callers |>
     surface = str_squish(surface)
   )
 
+make_passing = add_play_callers |>
+  mutate(is_pass = ifelse(play_type == 'pass', 1, 0)) |>
+  summarise(
+    avg_pass_rate = mean(is_pass),
+    avg_cpoe = mean(cpoe, na.rm = TRUE),
+    .by = c(nflverse_game_id, off_play_caller)
+  )
+
 
 cleaned_data = make_snap_shares |>
   left_join(make_features) |>
   left_join(make_context_vars) |>
+  left_join(make_passing) |>
   mutate(
     surface = case_when(
       nchar(surface) < 1 & stadium == "Levi's® Stadium" ~ 'grass',
