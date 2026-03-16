@@ -58,7 +58,18 @@ raw_data = (
         )
 )   
 
+plot_personnel = (
+    raw_data
+    .select(cs.starts_with('personnel'))
+    .unpivot()
+    .with_columns(
+        pl.col('variable').str.extract("(\\d{2})").str.to_integer()
+    )
+    .filter(pl.col('variable').is_in([11,12,13,21,22]))
 
+)
+fig,axe = plt.subplots()
+sns.kdeplot(plot_personnel, x = 'value', hue = 'variable')
 
 
 

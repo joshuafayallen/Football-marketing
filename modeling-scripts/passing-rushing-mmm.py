@@ -186,6 +186,8 @@ numeric_cols = (
                         'is_favored')).columns
 )
 
+wide_df.columns
+
 means = (
     just_controls
     .select(
@@ -281,7 +283,7 @@ reliable = (
     .get_column('column')
     .to_list()
 )
-
+reliable
 
 personnel_scaled = (
     wide_df
@@ -330,7 +332,7 @@ weight_data = (
     wide_df
     .select(
         pl.col('total_line', 'spread_line', 'is_home_team',
-                'avg_pass_rate', 'avg_cpoe', 'is_favored')
+                'avg_pass_rate', 'avg_cpoe', 'is_favored', 'avg_defenders_in_box')
     )
     .with_columns(
         pl.when(
@@ -342,9 +344,21 @@ weight_data = (
         .otherwise((pl.col('spread_line') * - 1))
     )
     .with_columns(
-        ((pl.col('total_line', 'spread_line','avg_pass_rate', 'avg_cpoe') -
-        pl.col('total_line', 'spread_line', 'avg_pass_rate', 'avg_cpoe').mean()) / 
-        pl.col("total_line", 'spread_line','avg_pass_rate', 'avg_cpoe').std()).
+        ((pl.col('total_line', 
+                'spread_line',
+                'avg_pass_rate',
+                'avg_cpoe',
+                'avg_defenders_in_box') -
+        pl.col('total_line',
+                'spread_line',
+                'avg_pass_rate',
+                'avg_cpoe',
+                'avg_defenders_in_box').mean()) / 
+        pl.col("total_line",
+                'spread_line',
+                'avg_pass_rate',
+                'avg_cpoe',
+                'avg_defenders_in_box').std()).
         name.suffix('_sdz')
     ).drop('is_home_team')
 )
@@ -403,7 +417,9 @@ coords_pl = {
     'predictors': just_controls_sdz.columns, 
     'play_callers': make_encoded_vars['off_play_caller'].unique().sort().to_list(), 
     'obs_id': np.arange(wide_df.height),
-    'weight_predictors': weight_data.select(pl.col('avg_pass_rate_sdz', 'avg_cpoe_sdz', 'is_favored')).columns,
+    'weight_predictors': weight_data.select(pl.col(
+    'avg_pass_rate_sdz', 'avg_cpoe_sdz', 
+    'avg_defenders_in_box_sdz')).columns,
     'spread_basis': [f"spread_{i}" for i in range(spread_basis.shape[1])], 
     'total_basis': [f"total_{i}" for i in range(total_basis.shape[1])]
 }
@@ -412,7 +428,9 @@ with pm.Model(coords = coords_pl) as mmm_pass_rush:
 
     weights_data = pm.Data(
         'weights_data', 
-        weight_data.select(pl.col("is_favored", 'avg_pass_rate_sdz', 'avg_cpoe_sdz')),
+        weight_data.select(pl.col(
+        'avg_pass_rate_sdz', 'avg_cpoe_sdz',
+        'avg_defenders_in_box_sdz')),
         dims = ('obs_id', 'weight_predictors')
     )
 
@@ -483,7 +501,7 @@ with pm.Model(coords = coords_pl) as mmm_pass_rush:
                                         dims = 'seasons')
     
     offset = pm.Normal('coach_offset',
-                        mu = logit(base_exp),
+                        mu = -1.3,
                         sigma = 1,
                         dims = ('play_callers', 'play_type'))
 
@@ -594,7 +612,7 @@ with pm.Model(coords = coords_pl) as mmm_pass_rush:
                         mu = np.array([
                         0.5,
                         0.3,
-                        0.3
+                        0.5
                         ]),
                         sigma = 0.2,
                         dims = 'weight_predictors')
@@ -643,7 +661,7 @@ with pm.Model(coords = coords_pl) as mmm_pass_rush:
 
     w_rush_zero_obs = pm.math.invlogit(w_rush_zero_logit)
 
-    w_pass_zero_int = pm.Normal('w_pass_int', -2, 0.5)
+    w_pass_zero_int = pm.Normal('w_pass_int', -1.5, 0.5)
     w_pass_coefs_sp = pm.Normal('pass_coefs_sp', 0, 0.3, dims = 'spread_basis')
     w_pass_coefs_tot = pm.Normal('pass_coefs_tot', 0, 0.3, dims = 'total_basis')
 
@@ -735,7 +753,4 @@ with mmm_pass_rush:
         pm.sample_posterior_predictive(idata, compile_kwargs={'mode': "NUMBA"})
     )
 
-az.plot_ppc(idata)
-
-
-
+idata.to_
