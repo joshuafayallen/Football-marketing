@@ -12,12 +12,12 @@ execute:
 
 ## Introduction 
 
-The rise of McVay's use of 13 personnel made me think of an old [*Athletic Football Show*](https://youtu.be/93RzplSc3mM?si=_2p7P7xEF0g43bxu&t=3395) episode where they pointed out the use of auxiliary runs to get to explosives. This got me thinking about how can we model the returns on NFL plays.  A major talking point in the 2025 season was Sean McVay's usage of 13 personnel to force another linebacker onto the field. The benefit of this is that they offense has heavier bodies on the field to help the run game but you are keeping more eligible receivers on the field. Since Kyle Shanahan and Sean McVay started as head coaches 8 years ago they have been two of the best play callers and play designers in the game. One way that their offenses are so good is that they find different ways to generate explosive plays. Typically explosive plays are defined as runs of ten plus yards or pass plays of twenty plus yards. Effectively you are gaining the equivalent of one plus first down on one play shortening the field and reducing the number of plays you have to run, or a quick touchdown. 
+The rise of McVay's use of 13 personnel made me think of an old [*Athletic Football Show*](https://youtu.be/93RzplSc3mM?si=_2p7P7xEF0g43bxu&t=3395) episode where they pointed out the use of auxiliary runs to get to explosives. This got me thinking about how can we model the returns on NFL plays?  A major talking point in the 2025 season was Sean McVay's usage of 13 personnel to force another linebacker onto the field. The benefit of this is that the offense has heavier bodies on the field to help the run game,  but you are keeping more eligible receivers on the field. Since Kyle Shanahan and Sean McVay started as head coaches 8 years ago, they have been two of the best play callers and play designers in the game. One way that their offenses are so good is that they find different ways to generate explosive plays. Typically, explosive plays are defined as runs of ten plus yards or pass plays of twenty plus yards. Effectively, you are gaining the equivalent of one plus first down on one play, shortening the field and reducing the number of plays you have to run, or a quick touchdown. 
 
-There are a variety of ways that Kyle Shanahan and Sean McVay try to manipulate defenses. The most obvious ways that they do this is the use of pre-snap motion. Pre-snap motion can help the QB check into the right play by tipping whether a defense is in man or zone. Motion directly before the snap forces the defense to adjust run and pass assignments on the fly creating and getting offensive players up to top speed before they start the play. 
+There are various ways Kyle Shanahan and Sean McVay try to manipulate defenses. The most obvious way they do this is through pre-snap motion. Pre-snap motion can help the QB check into the right play by tipping whether a defense is in man or zone. Motion directly before the snap forces the defense to adjust run and pass assignments on the fly, creating and getting offensive players up to top speed before they start the play. 
 
 
-Another way that Kyle and Sean  try to manufacture explosive plays is by using personnel packages in creative ways. Each personnel package has certain advantage but, generally, the idea is that you want a certain defenseive personnel grouping on the field and leverage their weaknesses. To make sure we are on the same page on what different personnel packages mean I have broken down the most common ones in @tbl-personnel. Conventionally personnel pacakges are broken down by the number of RBs on the field and the number of TEs on the field.
+Another way that Kyle and Sean try to manufacture explosive plays is by using personnel packages in creative ways. Each personnel package has certain advantages. Generally, the idea is that you want a certain defensive personnel grouping on the field and leverage their weaknesses. To make sure we are on the same page on what different personnel packages mean, I have broken down the most common ones in @tbl-personnel. Conventionally, personnel packages are broken down by the number of RBs on the field and the number of TEs on the field.
 
 ```{python}
 #| echo: false
@@ -56,13 +56,13 @@ GT(personnel_df)
 
 Since the days of the big neckroll the league has shifted. Due to changes in the rules passing has massively upticked. As a result defenses have tried to combat this schematically by playing with less defenders in the box, more defensive backs, and more complex pass coverages. Early on Kyle and Sean used a lot of under-center play action so defenses would simply change the picture on the quarterback when their backs were turned. To counter this Kyle has used a lot of 21 personnel to force a conflict between defending the run with lighter bodies or defending the pass with heavier bodies. 
 
-With all the talk of 13 personnel this year and ton of talk about pre-snap motion from the past few years I got kind of curious. What are the returns of some of these schematic trends and how can we model it? This is an interesting question for a variety of reasons. Should we focus on the design and mechanics of the play or should we focus more on what the bodies on the field get you? Well that kind of depends on a lot of things and as was the case for me what data you can access. Since I only have participation data I decided to look at explosive plays as a function of personnel grouping. 
+With all the talk of 13 personnel this year and a ton of talk about pre-snap motion from the past few years I got kind of curious. What are the returns of some of these schematic trends and how can we model it? This is an interesting question for a variety of reasons. Should we focus on the design and mechanics of the play or should we focus more on what the bodies on the field get you? Well that kind of depends on a lot of things and as was the case for me what data you can access. Since I only have participation data I decided to look at explosive plays as a function of personnel grouping. 
 
 ## How Can We Model This? 
 
-There are lots of ways we can model this but because play callers have these different personel packages that they can use my mind immediately went to Media Mixed Modeling(MMMs). What is an MMM? Lets say you are in a marketing department at a large electronics company with a 1 million dollar budget to spend on advertising. You spend that million dollars across various marketing channels whether this search optimization, TV, email marketing, or influencer marketing.^[There are many more places and ways to advertise] You then see that sales increased that month, but you want to know which channel was responsible for this spike so you can invest your money more wisely. In the early digital marketing age companies relied on multi-touch attribution models. The general idea of this was that if a consumer saw an ad on Facebook clicked on it and got the product. You could track those clicks back to consumer and then estimate a model to better undertand where to put your money. 
+There are lots of ways we can model this, but because play callers have these different personnel packages that they can use, my mind immediately went to Media Mixed Modeling (MMMs). What is an MMM? Let's say you are in a marketing department at a large electronics company with a $1 million budget to spend on advertising. You spend that million dollars across various marketing channels, whether this search optimization, TV, email marketing, or influencer marketing.^[There are many more places and ways to advertise.] You then see that sales increased that month, but you want to know which channel was responsible for this spike, so you can invest your money more wisely. In the early digital marketing age, companies relied on multi-touch attribution models. The general idea of this was that if a consumer saw an ad on Facebook, clicked on it, and got the product. You could track those clicks back to the consumer and then estimate a model to better understand where to put your money. 
 
-However, around 2020 as a response to privacy concerns, laws passed by various governing bodies, and IOS14 these models started to break. More people started using ad blockers, Apple made tracking these attribution points much harder, and some people started using browsers that restricted access to what companies could track. In short, following the customer behavior got a lot harder. So marketing analytics turned to good old fashion experiments and MMMs. The general idea of an MMM is that weekly conversions, sales, revenue, etc are a function of
+However, around 2020 as a response to privacy concerns, laws passed by various governing bodies, and IOS14 these models started to break. More people started using ad blockers, Apple made tracking these attribution points much harder, and some people started using browsers that restricted access to what companies could track. In short, following the customer behavior got a lot harder. So marketing analytics turned to good old fashion experiments and MMMs. The general idea of an MMM is that weekly conversions, sales, revenue, etc., are a function of
 
 $$
 Sales_t = \alpha + \overbrace{\sum^{m}_{m=1}\beta_{m}F(x^{*}_{t,m})}^{\text{Impact of marketing}} + \overbrace{\sum^{c}_{c=1} \gamma_{c} Z_{t,c}}^{\text{Impact of Controls}} + \varepsilon_{t}
@@ -71,7 +71,7 @@ $$
 
 We can then go ahead and measure the relative contribution of each channel and forecast forward on where we should spend our money and about how much money we should spend on that channel. As you may imagine there are lots of gnarly time dynamics in marketing that you have to deal with. As an electronics company executive you would anticipate that every year in late October to early November sales effectively just stop as people wait for Black Friday sales. You also anticipate that there is only so many ads you can run on the same customer base before they stop caring. 
 
-Snapping back to football this made me think of personnel groupings as channels. You more or less have a fixed number of plays per game which would track with a marketing budget. The play design may be more akin to a specific ads on each of these platforms to adapt to the user base and platform specific rules.^[Admittedly this is a pretty big simplifying assumption.] In addition, both marketing and football deal with really noisy data that try to capture complex behavioral dynamics and you do not have a ton of data to work with generally. Based on this idea I decided to try and build an MMM to understand how play-callers should invest their play budget. Perhaps just as importantly this felt like a fun opportunity to figure out how to build an MMM. 
+Snapping back to football, this made me think of personnel groupings as channels. You more or less have a fixed number of plays per game which would track with a marketing budget. The play design may be more akin to a specific ad on each of these platforms to adapt to the user base and platform specific rules.^[Admittedly, this is a pretty big simplifying assumption.] In addition, both marketing and football deal with really noisy data that tries to capture complex behavioral dynamics, and you do not have a ton of data to work with generally. Based on this idea, I decided to try and build an MMM to understand how play-callers should invest their play budget. Perhaps just as importantly, this felt like a fun opportunity to figure out how to build an MMM. 
 
 
 # Building a Regular MMM
@@ -129,7 +129,7 @@ df = (pl.DataFrame({
 
 ```
 
-Next we are going to generate synthetic data for two channels. Which are going to be a bit different based on carryover and the saturation parameters. Roughly the costs for the each of the channels look like this. 
+Next, we are going to generate synthetic data for two channels. These are going to be a bit different based on carryover and the saturation parameters. Roughly the costs for each of the channels look like this. 
 
 
 ```{python}
@@ -206,7 +206,7 @@ df = (
 
 ```
 
-The next thing we are going to do is add our concentration effects or how much money we spending in each chanel. 
+The next thing we are going to do is add our concentration effects or how much money we are spending in each channel. 
 
 
 ```{python}
@@ -297,8 +297,6 @@ ax.set_title("Trend & Seasonality Components", fontsize=18, fontweight="bold");
 
 Finally, we will just add our dependent variable and our controls 
 
-
-
 ```{python}
 #| code-fold: true
 epsilon = rng.normal(loc = 0.0, scale = 0.25, size = n)
@@ -342,12 +340,12 @@ ax.set(xlabel="date", ylabel="y (thousands)")
 
 ```
 
-[We can now go ahead and look at the ground truth](https://www.pymc-marketing.io/en/stable/notebooks/mmm/mmm_example.html), but that is an excercise left for the reader. 
+[We can now go ahead and look at the ground truth](https://www.pymc-marketing.io/en/stable/notebooks/mmm/mmm_example.html), but that is an exercise left for the reader. 
 
 
 ## Building The Regular MMM
 
-For whatever reason I found that working with PyMC is just easier to do in pandas so we are going to throw it over to Pandas. 
+~~For whatever reason, I found that working with PyMC is just easier to do in pandas so we are going to throw it over to Pandas.~~ After going through [ Chris Fonnesbeck's  case study on goaltending performance](https://www.pymc-labs.com/blog-posts/bayesian-spatial-modeling-for-evaluating-hockey-goaltending-performance) I have figured out how to more cleanly implement categorical variables in Polars and PyMC so this is just kind of an artifact.
 
 
 ```{python}
@@ -480,7 +478,7 @@ Since we have the ability to build a model where we know the true DGP we know th
 
 ## What are some of these parameters?
 
-So the entire crux of MMMs is that we don't expect ads: to work instantly, every additional ad to increase sales, and the effect of an ad to persist that much. Thee multiple avenues to see growth in the outcome of interest was what initially got me thinking about using these models. But when I started digging more into these models these time dynamics became what got me really excited to see how this could work. In this section I am going to borrow heavily from some excellent blog posts by [Ryan O'Sullivan](https://towardsdatascience.com/mastering-marketing-mix-modelling-in-python-7bbfe31360f9/?source=post_page-----49dce1a5b33d---------------------------------------)
+So the entire crux of MMMs is that we don't expect ads to work instantly, every additional ad to increase sales, and the effect of an ad to persist that much. The multiple avenues to see growth in the outcome of interest was what initially got me thinking about using these models. But when I started digging more into these models these time dynamics became what got me really excited to see how this could work. In this section I am going to borrow heavily from some excellent blog posts by [Ryan O'Sullivan](https://towardsdatascience.com/mastering-marketing-mix-modelling-in-python-7bbfe31360f9/?source=post_page-----49dce1a5b33d---------------------------------------)
 
 
 ### Adstock
@@ -527,7 +525,7 @@ plt.show()
 
 ```
 
-In effect geometrick adstock is just a weighted average of media spend in the current period and previous periods where we make an assumption about the maximum duratioon of the carryover effect. As the alpha values decrease the impact of the spend overtime. Generally this is used for re-targeting or campaigns with calls to action. Typically the reason you would set a low alpha value is if you are reasonably confident customers have seen the ad you are just trying to get them back onto your website to do something. The Red Cross doesn't want you to sit there and think about whether you should donate money after a hurricane or earthquake. They want to get you onto the website as quickly as possible to donate resources. 
+In effect, geometric adstock is just a weighted average of media spend in the current period and previous periods, where we make an assumption about the maximum duration of the carryover effect. As the alpha values decrease the impact of the spend overtime. Generally this is used for re-targeting or campaigns with calls to action. Typically the reason you would set a low alpha value is if you are reasonably confident customers have seen the ad you are just trying to get them back onto your website to do something. The Red Cross doesn't want you to sit there and think about whether you should donate money after a hurricane or earthquake. They want to get you onto the website as quickly as possible to donate resources. 
 
 Inversely if you just get into post-production for a movie and you have a tenative release date 2 months from now running an ad that tries to get you to buy a ticket is not all that helpful. You may want run a campaign where you are trying to get people excited to go to the movies. You would set a higher alpha value to reflect this expected decay. One sticking point about adstock, for me, is that we refer to the alpha parameter, but when we are playing around with the priors to get more realistic looking decays you are going to be changing the beta parameter. So if we wanted to get a similar looking Beta we would do something to this effect. 
 
@@ -735,7 +733,7 @@ If you skipped the non-football section I will give you a brief summary. One of 
 
 ## Building the Football Data
 
-For the entire rest of the blog post I rely on data provided by the `nflverse` team. Specifically we are going to look at the participation data from 2017-2024. Prior to 2023 this data were provided by NFL NGS while post 2023 the data are provided by FTN.^[You may know them as the company behind DVOA] Specifically we are interested in the offensive formation columns and defensive personnel. To give you a sense of what this looks like I provide an example for the first 5 plays of the Titans vs Bears game in the 2024 season.
+For the entire rest of the blog post, I rely on data provided by the `nflverse` team. Specifically, we are going to look at the participation data from 2017-2025. Prior to 2023, this data was provided by NFL NGS, while post 2023, the data are provided by FTN.^[You may know them as the company behind DVOA] Specifically, we are interested in the offensive formation columns and defensive personnel. To give you a sense of what this looks like I provide an example for the first 5 plays of the Titans vs Bears game in the 2024 season.
 
 
 ```{python}
@@ -752,7 +750,7 @@ examp = (
 
 ```
 
-The first order of business is to only include offensive plays this is pretty easy since there is a little flag to indicate whether it was a run, pass, special teams play etc. As far as regexs go this was a pretty simple one, but there is one tripping point. Typically we count the fullback as a running packing in these personnel packages, but in a much appreciated effort to keep the raw data intact they are recorded by their roster position. So for the 49ers who typically run 21 personnel you get this.   
+The first order of business is to only include offensive plays this is easy since there is a little flag to indicate whether it was a run, pass, special teams play etc. As far as regexs go this was a pretty simple one, but there is one tripping point. Typically, we count the fullback as a running back in these personnel packages, but in a much-appreciated effort to keep the raw data intact, they are recorded by their roster position. So, for the 49ers who typically run 21 personnel, you get this.   
 
 
 ```{python}
@@ -781,7 +779,7 @@ GT(examp2.drop(['n_rbs', 'n_tes', 'n_fb']))
 
 ```
 
-The simple trick to this is really just to add the RBs and Fullbacks together then convert those back to strings. 
+The simple trick to this is just to add the RBs and Fullbacks together, than convert those back to strings. 
 
 
 ```{python}
@@ -806,7 +804,7 @@ GT(fixed)
 
 ```
 
-So now these values look more sane than the ones that I initially came up with. The next step is to build the spend share variables and define the relevant time dimensions for between season. I did this in R just because the `nflreadr` version of the package lets you automatically merge the play-by-play data. For the playcaller data I am using [Sam Hoppen's data](https://github.com/samhoppen/NFL_public/blob/main/data/all_playcallers.csv). I just take the minimum for each play caller in the dataset and then subtract it from the current season to get their tenure. This approach does have a drawback just because we would expect that there is a bigger jump for a new playcaller from the start of their first season to the end of their first season.^[Very much open to suggestions on a better way to do this] Whereas a more experienced play caller it may not actually matter that much by the time they hit year four or five. My "ad spend" is just the number of plays that each playcaller makes out of each personell grouping.
+So now these values look saner than the ones that I initially came up with. The next step is to build the spend share variables and define the relevant time dimensions for the between-season. I did this in R just because the `nflreadr` version of the package lets you automatically merge the play-by-play data. For the play caller data, I am using [Sam Hoppen's data](https://github.com/samhoppen/NFL_public/blob/main/data/all_playcallers.csv). I just take the minimum for each play caller in the dataset and then subtract it from the current season to get their tenure. This approach does have a drawback just because we would expect that there is a bigger jump for a new play caller from the start of their first season to the end of their first season.^[Very much open to suggestions on a better way to do this] Whereas a more experienced play caller it may not actually matter that much by the time they hit year four or five. My "ad spend" is just the share of plays that each play caller makes out of each personnel grouping. 
 
 
 ```{r}
@@ -1000,7 +998,7 @@ cleaned_data = make_snap_shares |>
 ```
 
 
-There are a few things in here worth mentioning briefly. Instead of separating out explosive play rate into explosive pass and run I just keep them together and adjust for passing rate. Second I decided to consolidate all the possible surfaces and roofs into just outdoor and indoors. We would really only care if the game is outside, on-grass, and raining/snowing which would probably affect the rate of explosive plays. 
+There are a few things in here worth mentioning briefly. Instead of separating out explosive play rate into explosive pass and run I just keep them together and adjust for passing rate. Second, I decided to consolidate all the possible surfaces and roofs into just outdoor and indoor. We would really only care if the game is outside, on grass, and raining/snowing, which would probably affect the rate of explosive plays. 
 
 ```{python}
 #| label: clean-data-python
@@ -1186,7 +1184,7 @@ personnel_scaled = (
 
 ```
 
-To speed this process along a little bit I then go and make a few binary indicators, standardize my controls, then apply the max absolute value scaling to my outcome. Since explosive play rate is a proportion we can just model that with the Beta distribution. The issue is that a Beta regression can't model degenerate outcomes. This is statistician for exactly equal to zero or exactly equal to one. 
+To speed this process along a little bit, I then go and make a few binary indicators, standardize my controls, then apply the max absolute value scaling to my outcome. Since explosive play rate is a proportion, we can just model that with the Beta distribution. The issue is that a Beta regression can't model degenerate outcomes. This is just statistician for exactly equal to zero or exactly equal to one. 
 
 ```{python}
 
@@ -1196,7 +1194,7 @@ sns.histplot(data = scaled_y, x = 'explosive_play_rate_transformed')
 ```
 
 
-To handle this I nudged the values of explosive play rate away from zero and one. There are definetly drawbacks to this approach as outlined in [Kubinec 2023](https://www.cambridge.org/core/journals/political-analysis/article/abs/ordered-beta-regression-a-parsimonious-wellfitting-model-for-continuous-data-with-lower-and-upper-bounds/89F4141DA16D4FC217809B5EB45EEE83), but we are still working on a native PyMC implementation. 
+To handle this I nudged the values of explosive play rate away from zero and one. There are definitely drawbacks to this approach as outlined in [Kubinec 2023](https://www.cambridge.org/core/journals/political-analysis/article/abs/ordered-beta-regression-a-parsimonious-wellfitting-model-for-continuous-data-with-lower-and-upper-bounds/89F4141DA16D4FC217809B5EB45EEE83), but we are still working on a native PyMC implementation. 
 
 ## Modeling the data 
 
@@ -1377,11 +1375,11 @@ with mmm_spline:
 
 ```
 
-The next step is to manually build the adstocks for the personnel data. Here we are going to feed each of the personnel groupings through the adstock function. We are basically going to let the defenses look back 3ish games. In some ways this is likely a little restrictive. Teams may look back further than that to guess tendencies or how they play particular styles of defenses. You may see your divisional opponents in the first part of the season and then the final part of the season. 
+The next step is to manually build the adstocks for the personnel data. Here we are going to feed each of the personnel groupings through the adstock function. We are basically going to let the defenses look back 3ish games. In some ways, this is likely a little restrictive. Teams may look back further than that to guess tendencies or how they play particular styles of defense. You may see your divisional opponents in the first part of the season and then in the final part of the season. 
 
-However, I think that setting the maximum carryover effect to 3 strikes a nice balance. This roughly divides the 16-17 game schedule into 5ish overlapping chunks. Players tend to get hurt throughout the season forcing playcallers to adapt their personnel groupings. Shifts in the offensive philosophy may not have worked out that well or have been adapted to as people see these concepts more and more. The 3 games prior to the 17th maybe more informative than the games in the first three weeks of the season. How this works is that we are going to weight the game last week more than the game two weeks before, and so on and so forth depending on the size of the carryover effect we specify. 
+However, I think that setting the maximum carryover effect to 3 strikes a nice balance. This roughly divides the 16-17 game schedule into 5ish overlapping chunks. Players tend to get hurt throughout the season, forcing play callers to adapt their personnel groupings. Shifts in the offensive philosophy may not have worked out that well or have been adapted to as people see these concepts more and more. The 3 games before the 17th may be more informative than the games in the first three weeks of the season. How this works is that we are going to weight the game last week more than the game two weeks before, and so on and so forth, depending on the size of the carryover effect we specify. 
 
-Next we are going to transform it using a logistic saturation function. By doing this all we are saying is that there are only so many plays we can invest into a single personnel grouping during a game before we see diminishing returns. If you play 21 personnel for 70% of the game then moving to 80% is not going to result in a a 10% jump in explosive plays. 
+Next, we are going to transform it using a logistic saturation function. By doing this, all we are saying is that there are only so many plays we can invest into a single personnel grouping during a game before we see diminishing returns. If you play 21 personnel for 70% of the game, then moving to 80% is not going to result in a 10% jump in explosive plays. 
 
 ```{python}
 
@@ -1412,7 +1410,7 @@ with mmm_spline:
 
 ```
 
-Then we are just going to fuse everthing together by taking our saturated x's and our prior on the channel contributions. In this case I separated out the pass rate from the rest of the controls just because I want it to vary a bit more. I ended up doing this just because it seemed to improve sampling and the overall fit of the posterior predictive. 
+Then we are just going to fuse everything together by taking our saturated x's and our prior on the channel contributions. In this case, I separated out the pass rate from the rest of the controls just because I want it to vary a bit more. I ended up doing this just because it seemed to improve sampling and the overall fit of the posterior predictive. 
 
 
 ```{python}
@@ -1492,7 +1490,7 @@ chunks = [vars[i:i + 5] for i in range(0, len(vars) , 5)]
 ```
 
 
-Overall it looks like these parameters are sampling well
+Overall, it looks like these parameters are sampling well
 
 ```{python}
 #| echo: false
@@ -1501,7 +1499,7 @@ az.plot_trace(idata, var_names=chunks[0], compact=True)
 ```
 
 
-Lets look at the personnel contributions, control contributions, and our mu parameter. Again these are looking good. 
+Let’s look at the personnel contributions, control contributions, and our mu parameter. Again, these are looking good. 
 
 
 ```{python}
@@ -1510,7 +1508,7 @@ az.plot_trace(idata, var_names=chunks[3], compact = True)
 ```
 
 
-To save the trouble of looking through every single parameter we can kind of just peek at whether the model explores the posterior well. As we can see the model looks 
+To save the trouble of looking through every single parameter, we can kind of just peek at whether the model explores the posterior well. As we can see, the model looks 
 
 
 ```{python}
@@ -1528,7 +1526,7 @@ The final and perhaps most important thing is to check how well the model fits t
 az.plot_ppc(idata)
 ```
 
-In this case the model does an okay job at fitting the underlying data but we miss a lot of the interesting shapes and bumps in the observed data. Lets just look at the contributions per channel. 
+In this case the model does an okay job at fitting the underlying data, but we miss a lot of the interesting shapes and bumps in the observed data. Let’s just look at the contributions per channel. 
 
 
 ```{python}
@@ -1582,13 +1580,13 @@ plt.show()
 
 ```
 
-We don't see any appreciable returns for personnel groupings. Obviously this could be true! The design of the play is probably doing than putting an extra tight end on the field. But it could be that the model is not capturing the underlying data well! We have seen that the posterior predictive sort of follows the underlying data. We assumed that the saturation curve was logistic meaning there is some theoretical inflection point where we shouldn't spend any more money on that channel. More games are going to have no explosive plays than be closer to 25% of plays being explosive so the model needs to handle the bunching closer to zero. Additionally, we defined investment in terms of share of plays rather than the number of plays. 
+We don't see any appreciable returns for personnel groupings. Obviously, this could be true! The design of the play is probably doing more than putting an extra tight end on the field. But it could be that the model is not capturing the underlying data well! We have seen that the posterior predictive sort of follows the underlying data. We assumed that the saturation curve was logistic meaning there is some theoretical inflection point where we shouldn't spend any more money on that channel. More games are going to have fewer explosive plays than be closer to 25% of plays being explosive, so the model needs to handle the bunching closer to zero. Additionally, we defined investment in terms of share of plays rather than the number of plays. 
 
-The other thing that can be said is that we don't really have a ton of data for each coach. While Andy Reid has called plays for 18 years we only observe 8 which equates to 144 weeks of data.^[In the latter parts of the 2017 season Andy Reid hands play calling duties to Matt Nagy] This is right around the reccommended amount of data for a reliable MMM. Partially this is because we want the model to learn the features of the data and not have our priors dominate. The other part is that we have a ton of parameters for a kind of small model. For our channel contributions we have around 5 parameters without accounting for hierarcharies and our HSGPs. It may be that we don't need the HSGP for the season because it is eating some of the variation that the channels should be explaining.
+The other thing that can be said is that we don't really have a ton of data for each coach. While Andy Reid has called plays for 18 years, we only observe 8, which equates to 144 weeks of data.^[In the latter parts of the 2017 season, Andy Reid handed play-calling duties to Matt Nagy] This is right around the recommended amount of data for a reliable MMM. Partially, this is because we want the model to learn the features of the data and not have our priors dominate. The other part is that we have a ton of parameters for a kind of small model. For our channel contributions, we have around 5 parameters without accounting for hierarchies and our HSGPs. It may be that we don't need the HSGP for the season because it is eating some of the variation that the channels should be explaining.
 
 ### Refining the model 
 
-Through lots of fiddling I found that the only real way to improve the fit of the model is change the likelihood. The first thing I tried, since I have never worked with one, was a mixture model. The main idea is that populations are, generally, made up of a lot of different kinds of groups. For example, if we plotted all the heights in the NFL we would get something that looks pretty close to a Gaussian distribution. However, we know that there are generally different height thresholds that teams stick to for each position group. Consequently the overall distribution of heights in the NFL is just a mixture of the smaller distributions of heights in position groups. 
+Through lots of fiddling, I found that the only real way to improve the fit of the model is to change the likelihood. The first thing I tried, since I have never worked with one, was a mixture model. The main idea is that populations are, generally, made up of a lot of different kinds of groups. For example, if we plotted all the heights in the NFL, we would get something that looks pretty close to a Gaussian distribution. However, we know that teams generally use different height thresholds for each position group. Consequently, the overall distribution of heights in the NFL is just a mixture of the smaller distributions of heights in position groups. 
 
 
 ```{python}
@@ -1600,17 +1598,15 @@ sns.kdeplot(heights, x = 'height', hue = 'position')
 
 ```
 
-We can use this idea to either model these distributions, essentially, creating a bunch of component Gaussian distributions with a different mean and maybe a different standard deviation. Then we are going to model each of those components and combine them at the end. The way it does this is by adding a weight to each of these component parts to tell the model where they are likely to belong. Mixture models are not neccessarily limited to models with distinct sub-populations. We can use these models to give us flexibililty for bimodal distributions, phenomena where we have lots of zeros or ones, and a whole host of other things. 
+We can use this idea to either model these distributions, essentially, creating a bunch of component Gaussian distributions with a different mean and maybe a different standard deviation. Then we are going to model each of those components and combine them at the end. It does this by assigning a weight to each component part to indicate where it is likely to belong. Mixture models are not necessarily limited to models with distinct sub-populations. We can use these models to give us flexibility for bimodal distributions, phenomena where we have lots of zeros or ones, and a whole host of other things. 
 
-For example, if we wanted to model whether a player is likely to be drafted in the first round and then their projected value as a first round pick we would want to build a hurdle model. We can think of a hurdle model as a mixture model with a particular structure where we are modeling whether they are above some threshold and then modeling another data generating process. So in our example the hurdle model is going to estimate the probability they would be picked in the first round. The model that handles whether they were a first rounder would be a simple binary classifier where we including variables like college production, their measurables, some observable measure of their character, and quality of their competition. The next part of the model would then just model expected value of the pick. Mixture models give us lots of ways to build in flexibility into our models. 
+For example, if we wanted to model whether a player is likely to be drafted in the first round and then their projected value as a first-round pick, we would want to build a hurdle model. We can think of a hurdle model as a mixture model with a particular structure where we are modeling whether they are above some threshold and then modeling another data-generating process. So, in our example, the hurdle model is going to estimate the probability they would be picked in the first round. The model that handles whether they were a first-rounder would be a simple binary classifier where we include variables like college production, their measurables, some observable measure of their character, and the quality of their competition. The next part of the model would then just model the expected value of the pick. Mixture models give us lots of ways to build flexibility into our models. 
 
-In our case, there are a bunch of different dynamics that could lead to an offense having no explosive plays in a game. Additionally, player availability during the season could cause bimodality in the data that we aren't modeling. We saw in @fig-ppc-simple-beta that there were lots of peaks and valleys as well as lots of bunching closer to zero.^[Undoubtedly this partially because of our clipping procedure.] By using a mixture model we can try to handle some of the quirks of this data by divinding the model a few different ways. 
+In our case, there are a bunch of different dynamics that could lead to an offense having no explosive plays in a game. Additionally, player availability during the season could cause bimodality in the data that we aren't modeling. We saw in @fig-ppc-simple-beta that there were lots of peaks and valleys as well as lots of bunching closer to zero.^[Undoubtedly this is partially because of our clipping procedure.] By using a mixture model, we can try to handle some of the quirks of this data by dividing the model a few different ways. 
 
-The first way I tried was to keep passes and rushes together and then try to separate the games with low explosive plays. This could be some combination of a bad game, terrible weather, or the defense playing an insane game that could explain low explosive play production. Just as likely is that over the course of the NFL season players are going to get hurt. This is going to have big impacts as the you dip into offensive line depth or your third wide receiver is now getting all the targets that would be going to your WR 1. There are also things that can vault you into the middle of the distribution like a rookie WR finally figuring out how to play in the pros or you are going against an easier stretch of your schedule. 
+The first way I tried was to keep passes and rushes together and then try to separate the games with low-explosive plays. This could be some combination of a bad game, terrible weather, or the defense playing an insane game that could explain low explosive play production. Just as likely is that over the course of the NFL season, players are going to get hurt. This is going to have big impacts as you dip into offensive line depth or your third wide receiver is now getting all the targets that would be going to your WR 1. There are also things that can vault you into the middle of the distribution, like a rookie WR finally figuring out how to play in the pros, or you are going against an easier stretch of your schedule. 
 
-## Mixtures 
-
-To keep it simple I am just going to focus on the changes that I made to the model. The first thing I did was that I ditched the HSGP for games and then changed the saturation to a Michaelis-Menten saturation which is used more for online campaigns where we expect the decay to set in much more quickly.
+To keep it simple, I am just going to focus on the changes that I made to the model. The first thing I did was that I ditched the HSGP for games and then changed the saturation to a Michaelis-Menten saturation, which is used more for online campaigns where we expect the decay to set in much more quickly.
 
 
 ```{python}
@@ -1823,7 +1819,7 @@ with pm.Model(coords = coords) as mmm_examp:
 
 ```
 
-The most important part is to define the mixture part. Here we are going to try to learn whether each coach is in near zero play regime. We could really make this complicated by adding more and more covariates to our `w_coach_logit` param. However, just using the baseline for each coach gets us pretty close. The posterior predicitive follows our observed data a lot better. 
+The most important part is to define the mixture part. Here, we are going to try to learn whether each coach is in a near-zero play regime. We could really make this complicated by adding more covariates to our `w_coach_logit` param. However, just using the baseline for each coach gets us pretty close. The posterior predictive follows our observed data a lot better. 
 
 
 
@@ -1887,15 +1883,15 @@ az.plot_ppc(idata)
 
 ```
 
-However, we do get a lot more divergences. Instead of trying to model the low explosive regime in the mixture I decided to take a different approach. We are going to build a model that captures overall explosive play rate as a function of passing and rushing explosive play rate. The data cleaning changes a touch. For transparency I also include average completion percentage above expected (CPOE) and vegas odds. The main idea that I had was that the weights can be modeled as a function of how much they are passing and how well the QB is throwing the ball.^[More informally how much are they slinging the rock and how well they are slinging that rock.] In practice once we decompose explosive play rate into run and pass we see a lot more bunching closer to zero. 
+However, we do get a lot more divergences. Instead of trying to model the low explosive regime in the mixture, I decided to take a different approach. We are going to build a model that captures overall explosive play rate as a function of passing and rushing explosive play rate. The data cleaning changes a touch. For transparency, I also include the average completion percentage above expected (CPOE) and Vegas odds. The main idea that I had was that the weights can be modeled as a function of how much they are passing and how well the QB is throwing the ball.^[More informally, how much are they slinging the rock and how well they are slinging that rock.] In practice, once we decompose explosive play rate into run and pass, we see a lot more bunching closer to zero. 
 
-After getting stuck for a little bit on how do deal with this problem I consulted the Claude on what to do. The suggestion was to build an inner mixture for passing and rushing. These inner mixtures are going to handle the squishing towards zero problem by adding the spread and total to try and anticipate the game script. This inner mixture is a bit closer to a zero inflated model. The outer mixture weights are going to be a function of the passing rate, average CPOE, and on average how many defenders are in the box. The model was getting so complex that I started to refer to it as "The Beast."^[This was directly inspired/ripped off from Dane Brugler's massive draft guide of the same moniker]
+After getting stuck for a little bit on how to deal with this problem, I consulted Claude on what to do. The suggestion was to build an inner mixture for passing and rushing. These inner mixtures are going to handle the squishing towards zero problem by adding the spread and total to try to anticipate the game script. This inner mixture is a bit closer to a zero-inflated model. The outer mixture weights are going to be a function of the passing rate, average CPOE, and on average how many defenders are in the box. The model was getting so complex that I started to refer to it as "The Beast."^[This was directly inspired/ripped off from Dane Brugler's massive draft guide of the same moniker]
 
-The problem is that we don't actually have a ton of data. The posterior distribution for a simple Bayesian model is really just a compromise between our likelihood and prior. Too little data and our prior is going to inform the posterior more and vice-versa. For most Bayesian GLMs this is pretty trivial. The posterior is going to be more informed by the data than the priors pretty quickly. When we add the neccessary components for a MMM our model needs more data to identify the contributions for each media channel. For the model to work well we need some meaninful variation between our channels. 
+The problem is that we don't actually have a ton of data. The posterior distribution for a simple Bayesian model is really just a compromise between our likelihood and prior. Too little data, and our prior is going to inform the posterior more and vice versa. For most Bayesian GLMs, this is pretty trivial. The posterior is going to be more informed by the data than the priors pretty quickly. When we add the necessary components for a MMM, our model needs more data to identify the contributions for each media channel. For the model to work well, we need some meaningful variation between our channels. 
 
-By adding a really complicated mixture model on top of that we add an additional identifiability problem. There are lot of very reasonable stories for how we can arrive at a game with a low explosive play rate. The model, in turn, finds a lot of these stories through various combinations of variables in the data. Separating out what the real story is quite difficult and our model will end up falling back on our priors. In general, we would prefer the data to do most of the talking. 
+By adding a complicated mixture model on top of that, we add an additional identifiability problem. There are a lot of very reasonable stories for how we can arrive at a game with a low explosive play rate. The model, in turn, finds a lot of these stories through various combinations of variables in the data. Separating out what the real story is quite difficult and our model will end up falling back on our priors. In general, we would prefer the data to do most of the talking. 
 
-Part of the sticking point with the model and the actual football implementation is the core idea behind these modern offenses. The offensive meta right now is that coaches are going to invest a lot of snaps in two or three personnel groupings. However, from those two or three personnel groupings we are going to implment all our run and pass concepts and they are going to look identical.^[The exception in some respects is 11 where coaches need more wide receivers out in the concept for obvious passing situtions.] If we take our simulated dataset as a best case sceanario we can see the inherent tension between the model and the data. 
+Part of the sticking point with the model and the actual football implementation is the core idea behind these modern offenses. The offensive meta right now is that coaches are going to invest a lot of snaps in two or three personnel groupings. However, from those two or three personnel groupings we are going to implement all our run and pass concepts and they are going to look identical.^[The exception in some respects is 11, where coaches need more wide receivers out in the concept for obvious passing situations.] If we take our simulated dataset as a best case scenario, we can see the inherent tension between the model and the data. 
 
 ```{python}
 
@@ -1928,8 +1924,46 @@ axe[1].set_title('Idealized Variation')
 
 ```
 
-In our simulated ad spending we see a lot of variation across `x1` and `x2` especially compared to some of our heavier personnel groupings. We do see a lot more variation in the simulated spending which is kind of by design. I can't speak to what real advertising looks like but from my understanding firms do frequently turn advertising on and off. Part of this is just when people are likely to buy something or there will be something to buy you are going to start to run ads. The other part is that people running marketing analytics use experiments to understand the causal effect of advertising and then recalibrate priors based on these models and/or introduce the experimental data into the likelihood to have it explain the data. This introduces both semi-artificial variance and consumer based variance. 
+In our simulated ad spending, we see a lot of variation across `x1` and `x2`, especially compared to some of our heavier personnel groupings. We do see a lot more variation in the simulated spending which is kind of by design. I can't speak to what real advertising looks like but from my understanding firms do frequently turn advertising on and off. Part of this is just when people are likely to buy something or there will be something to buy you are going to start to run ads. The other part is that people running marketing analytics use experiments to understand the causal effect of advertising and then recalibrate priors based on these models and/or introduce the experimental data into the likelihood to have it explain the data. This introduces both semi-artificial variance and consumer-based variance. 
 
 ## Starting From Scratch 
 
-At this point in the journey we could file drawer it but I am still genuinely curious about the ROI 
+At this point in the journey, we stick it in the file drawer and find a different project. But I am inherently stuborn so we are going to try again. What seems to work well is trying to model the low to no explosive play rate regimes, the mean explosive play rate regimes, and the high explosive play rate regimes separtely. To get around the problem of fitting 2-3 separate models for each regime we can try to consolidate this into one likelihood. 
+
+To do this we are going to fit an Ordered Beta Regression. The main idea is that we are going to use a Dirichlet distribution and a Beta distribution fused together. What the model effecitively does is treat your outcome as a fusion of three categories: exactly 0, between 0 and 1, and exactly 1. Our model is really just a fancy ordered logit where the cutpoints between categories determines the shifts in probabilities between categories. 
+
+Borrowing some work from [Andrew Heiss's blog post](https://www.andrewheiss.com/blog/2023/09/18/understanding-dirichlet-beta-intuition/) we 
+
+```{python}
+
+draws = rng.dirichlet(
+    alpha = [3,7,2], size = 100
+)
+
+cats = ['Category A', 'Category B', 'Category C']
+
+dat = (
+    pl.from_numpy(draws)
+    .unpivot()
+    .with_columns(
+        pl.when(
+            pl.col('variable') == 'column_0'
+        )
+        .then(pl.lit('Category A'))
+        .when(
+            pl.col('variable') == 'column_1'
+        )
+        .then(pl.lit('Category B'))
+        .otherwise(pl.lit('Category C'))
+        .alias('nice_cat')
+    )
+)
+fig, axe = plt.subplots()
+g = sns.FacetGrid(dat, col = 'nice_cat', hue = 'nice_cat')
+
+g.map(sns.kdeplot, 'value')
+g.set_titles(col_template="{col_name}")
+g.axes[0,0].set_xlabel('Probability of Proportion')
+g.axes[0,1].set_xlabel('')
+g.axes[0,2].set_xlabel('')
+```
