@@ -78,6 +78,8 @@ make_features = add_play_callers |>
   group_by(season, nflverse_game_id, off_play_caller) |>
   summarise(
     success_rate = mean(success, na.rm = TRUE),
+    total_plays = n(),
+    n_explosive = sum(is_explosive),
     explosive_play_rate = mean(is_explosive, na.rm = TRUE),
     avg_epa = mean(epa, na.rm = TRUE),
     avg_defenders_in_box = mean(defenders_in_box, na.rm = TRUE),
@@ -119,6 +121,7 @@ make_context_vars = add_play_callers |>
     avg_diff,
     off_play_caller,
     play_caller_tenure,
+    play_caller_mins
   ) |>
   ungroup() |>
   mutate(

@@ -9,7 +9,9 @@ import pandas as pd
 import arviz as az
 import numpy as np
 from scipy.special import expit
+from patsy import dmatrix
 import seaborn as sns
+
 
 seed = 14993111
 
@@ -28,7 +30,7 @@ keep_these = (
         pl.len().alias('games_called')
     )
     .filter(
-        pl.col('games_called') >= 100 # generally we want at least like two years of data 
+        pl.col('games_called') >= 104 # generally we want at least like two years of data 
     )
     ['off_play_caller'].to_list()
 )
@@ -255,10 +257,6 @@ coords = {
 }
 
 
-scaled_y['explosive_play_rate_transformed'].median()
-
-
-
 with pm.Model(coords = coords) as sans_games_mm:
     global_controls = pm.Data(
         'control_data', just_controls_sdz.drop('avg_pass_rate', axis = 1),
@@ -282,7 +280,7 @@ with pm.Model(coords = coords) as sans_games_mm:
                             dims = 'obs_id')
 
 
-    gps_sigma = pm.Exponential('gps_sigma', 2)
+    gps_sigma = pm.Exponential('gps_sigma', 10)
 
     ls = pm.InverseGamma('ls',
                         alpha = between_season_gp.alpha,
@@ -300,13 +298,22 @@ with pm.Model(coords = coords) as sans_games_mm:
                                             X = x_seasons,
                                             dims = 'seasons')
 
+    coach_sigma = pm.HalfNormal('coach_sigma', 0.5)
+    coach_raw = pm.Normal('coach_raw', 0,1, dims = 'play_callers')
+
     coach_mean_raw = pm.Normal('coach_mean_raw',
-                                mu = logit(0.3),
-                                sigma = 0.2,
-                                dims = 'play_callers')
+                                mu = logit(obs_exp_plays.mean()),
+                                sigma = 0.5)
+    
+    coach_mean = pm.Deterministic(
+        'coach_mean', 
+        coach_mean_raw + coach_sigma * coach_raw, 
+        dims = 'play_callers'
+    )
+    
 
     coach_mu = pm.Deterministic('coach_mu', 
-                                coach_mean_raw[coach_idx] + 
+                                coach_mean[coach_idx] + 
                                 coach_evolution[season_idx],
                                 dims = 'obs_id')
 
@@ -314,7 +321,7 @@ with pm.Model(coords = coords) as sans_games_mm:
 
     adstock_alphas = pm.Beta('adstock_alphas',
                                 alpha = 1,
-                                beta = 8, dims = 'channels')
+                                beta = 12, dims = 'channels')
 
     controls_beta = pm.Normal('controls_beta', mu=0, sigma= 0.05,
     dims='predictors')
@@ -334,10 +341,13 @@ with pm.Model(coords = coords) as sans_games_mm:
         adstock_list.append(geometric_adstock(cols, adstock_alphas[i],
                             l_max = 2))
 
-    x_adstock = pt.stack(adstock_list, axis = 1)
+    x_adstock = pm.Deterministic(
+        'x_adstock',
+        pt.stack(adstock_list, axis = 1),
+        dims = ('obs_id', 'channels'))
 
-    mm_alpha = pm.Gamma('mm_alpha', alpha=2, beta=4, dims='channels')   
-    mm_lam = pm.Gamma('mm_lam', alpha=2, beta=10, dims='channels')  
+    mm_alpha = pm.Gamma('mm_alpha', alpha=3, beta=6, dims='channels')   
+    mm_lam = pm.Gamma('mm_lam', alpha=3, beta=15, dims='channels')  
 
 
     saturated_list = []
@@ -347,7 +357,11 @@ with pm.Model(coords = coords) as sans_games_mm:
         saturated_list.append(
         michaelis_menten(x_adstock[:, i], mm_alpha[i], mm_lam[i]))
 
-    x_saturated = pt.stack(saturated_list, axis=1)
+    x_saturated = pm.Deterministic(
+        'x_saturated',
+        pt.stack(saturated_list, axis=1),
+        dims = ('obs_id', 'channels'))
+
 
 
     personnel_contribution = pm.Deterministic(
@@ -366,15 +380,15 @@ with pm.Model(coords = coords) as sans_games_mm:
         dims='obs_id'
     )
     # like 1/25 plays is explosive
-    #precision = pm.Exponential('precision', 1/15)
-    precision = pm.Gamma('precision', alpha = 10, beta = 0.5)
+    precision = pm.Exponential('precision', 1/20)
+    #precision = pm.Gamma('precision', alpha = 10, beta = 0.5)
     mu_logit = pm.math.invlogit(mu)
 
 
     pm.Beta(
         'y_obs', 
-        alpha = mu_logit * precision, 
-        beta = (1-mu_logit) * precision,
+        mu = mu_logit , 
+        nu =  precision,
         observed = obs_exp_plays,
         dims = 'obs_id')
     
@@ -382,14 +396,14 @@ with pm.Model(coords = coords) as sans_games_mm:
 
 
 with sans_games_mm:
-    idata_mm = pm.sample_prior_predictive()
+    idata_hsgp = pm.sample_prior_predictive()
 
 
-az.plot_ppc(idata_mm, group = 'prior', observed = True)
+az.plot_ppc(idata_hsgp, group = 'prior', observed = True)
 
 
 with sans_games_mm:
-    idata_mm.extend(
+    idata_hsgp.extend(
         pm.sample(
             random_seed=RANDOM_SEED, nuts_sampler='numpyro', progressbar=True
         )
@@ -397,10 +411,502 @@ with sans_games_mm:
 
 
 with sans_games_mm:
-    idata_mm.extend(
-        pm.sample_posterior_predictive(idata_mm)
+    idata_hsgp.extend(
+        pm.sample_posterior_predictive(idata_hsgp)
     )
 
-az.plot_ppc(idata_mm)
+az.plot_ppc(idata_hsgp)
+
+az.plot_energy(idata_hsgp)
+len(unique_seasons) / 3
+
+n_knots = 9
+knots = np.quantile(unique_seasons, np.linspace(0,1, n_knots))
+
+spline = dmatrix(
+    "bs(tenure, knots = knots, degree = 3, include_intercept = True) - 1", 
+    {'tenure': unique_seasons, "knots": knots[1:-1]}
+)
+
+basis_set = np.array(spline)
+
+coords['spline_basis'] = [f"s{i}" for i in range(basis_set.shape[1])]
+
+
+with pm.Model(coords = coords) as mmm_spline:
+    global_controls = pm.Data(
+        'control_data', just_controls_sdz.drop('avg_pass_rate', axis = 1),
+                        dims = ('obs_id', 'predictors')
+    )
+
+    passing_dat = pm.Data('passing_data',
+                            just_controls_sdz['avg_pass_rate'],
+                            dims = 'obs_id')
+
+    personnel_dat = pm.Data(
+        'personel_data', personnel_scaled, dims = ('obs_id','channels')
+    )
+
+    spline_basis_dat = pm.Data(
+        'spline_bais', 
+        basis_set[season_idx], 
+        dims = ('obs_id', 'spline_basis')
+    )
+
+    obs_exp_plays = pm.Data('obs_exp_plays',
+                            scaled_y['explosive_play_rate_transformed'].to_numpy(),
+                            dims = 'obs_id')
+    
+    spline_sigma = pm.Exponential('beta_sigma', 2)
+    spline_raw = pm.Normal('spline_raw', 0 , 1, shape = basis_set.shape[1])
+
+    spline_beta = pm.Deterministic(
+        'spline_beta', 
+        spline_sigma * spline_raw, 
+        dims = 'spline_basis'
+    )
+
+    season_contributions = pm.Deterministic(
+        'season_contribution', 
+        pm.math.dot(spline_basis_dat, spline_beta), 
+        dims = 'obs_id'
+    )
+
+    coach_sigma = pm.HalfNormal('coach_sigma', 0.5)
+    coach_raw = pm.Normal('coach_raw', 0,1, dims = 'play_callers')
+
+    coach_mean_raw = pm.Normal('coach_mean_raw',
+                                mu = logit(obs_exp_plays.mean()),
+                                sigma = 0.5)
+    
+    coach_mean = pm.Deterministic(
+        'coach_mean', 
+        coach_mean_raw + coach_sigma * coach_raw, 
+        dims = 'play_callers'
+    )
+    
+
+    coach_mu = pm.Deterministic('coach_mu', 
+                                coach_mean[coach_idx] + 
+                                season_contributions,
+                                dims = 'obs_id')
+
+                                
+
+    adstock_alphas = pm.Beta('adstock_alphas',
+                                alpha = 1,
+                                beta = 12, dims = 'channels')
+
+    controls_beta = pm.Normal('controls_beta', mu=0, sigma= 0.05,
+    dims='predictors')
+
+    control_contribution = pm.Deterministic(
+        'control_contribution', 
+        pm.math.dot(global_controls, controls_beta), 
+        dims='obs_id'
+
+    )
+
+    adstock_list = []
+    
+
+    for i in range(len(coords['channels'])):
+        cols = personnel_dat[:,i]
+        adstock_list.append(geometric_adstock(cols, adstock_alphas[i],
+                            l_max = 2))
+
+    x_adstock = pm.Deterministic(
+        'x_adstock',
+        pt.stack(adstock_list, axis = 1),
+        dims = ('obs_id', 'channels'))
+
+    mm_alpha = pm.Gamma('mm_alpha', alpha=3, beta=6, dims='channels')   
+    mm_lam = pm.Gamma('mm_lam', alpha=3, beta=15, dims='channels')  
+
+
+    saturated_list = []
+
+    for i in range(len(coords['channels'])):
+
+        saturated_list.append(
+        michaelis_menten(x_adstock[:, i], mm_alpha[i], mm_lam[i]))
+
+    x_saturated = pm.Deterministic(
+        'x_saturated',
+        pt.stack(saturated_list, axis=1),
+        dims = ('obs_id', 'channels'))
+
+    personnel_contribution = pm.Deterministic(
+                                            'personnel_contribution',    
+                                            x_saturated.sum(axis=1),
+                                            dims='obs_id')
+
+
+    passing_prior = pm.Normal('passing_prior', mu = 0, sigma = 0.1)
+
+
+
+    mu = pm.Deterministic('mu',
+        coach_mu +  
+        personnel_contribution +  
+        control_contribution + 
+        (pm.math.dot(passing_prior, passing_dat)),      
+        dims='obs_id'
+    )
+    # like 1/25 plays is explosive
+    #precision = pm.Exponential('precision', 1/20)
+    precision = pm.Gamma('precision', alpha = 10, beta = 0.5)
+    mu_logit = pm.math.invlogit(mu)
+
+
+    pm.Beta(
+        'y_obs', 
+        mu = mu_logit , 
+        nu = precision,
+        observed = obs_exp_plays,
+        dims = 'obs_id')
+
+with mmm_spline:
+    idata_spline = pm.sample_prior_predictive()
+
+
+az.plot_ppc(idata_spline, group = 'prior', observed=True)
+
+with mmm_spline:
+    idata_spline.extend(
+        pm.sample(random_seed=RANDOM_SEED, nuts_sampler='numpyro')
+    )
+
+
+
+with mmm_spline:
+    idata_spline.extend(
+        pm.sample_posterior_predictive(idata_spline)
+    )
+
+az.plot_energy(idata_spline)
+
+az.plot_ppc(idata_spline)
+
+spline_mu = az.extract(
+    idata_spline, group = 'posterior', var_names='spline_beta'
+).values
+
+spline_curve = basis_set @ spline_mu
+
+fig,axs = plt.subplots(2,1)
+
+pm.gp.util.plot_gp_dist(
+    ax = axs[0], 
+    samples = spline_curve.T,
+    x = unique_seasons,
+    #alpha = 0.5
+)
+
+axs[0].set_title('Posterior spline')
+
+hsgp = az.extract(idata_hsgp, group = 'posterior', var_names='coach_evolution')
+
+pm.gp.util.plot_gp_dist(
+    ax = axs[1], 
+    samples= hsgp.values.T,
+    x = unique_seasons,
+)
+
+axs[1].set_title('Posterior HSGP')
+
+
+with sans_games_mm:
+    pm.compute_log_likelihood(idata_hsgp)
+
+with mmm_spline:
+    pm.compute_log_likelihood(idata_spline)
+    
+
+mod_names = ['mod with hsgp', 'mod with spline']
+
+mod_dict = dict(zip(mod_names,[idata_hsgp, idata_spline]))
+
+az.compare(mod_dict)
+
+
+az.plot_trace(idata_spline, var_names=['coach_mu'])
+
+
+
+post_spline = idata_spline['posterior']
+shanny_mean = post_spline.sel(play_callers = 'Kyle Shanahan')
+
+shanny_idx = list(coords['play_callers']).index('Kyle Shanahan')
+
+shanny_mask = coach_idx == shanny_idx
+shanny_obs = np.where(shanny_mask)[0]
+
+
+base = post_spline['coach_mu'].isel(obs_id = shanny_obs).mean(dim = ['chain', 'draw']).values
+
+per_channel = (
+    post_spline['x_saturated']
+    .isel(obs_id = shanny_obs)).mean(dim = ['chain', 'draw']).values 
+
+
+
+game_order = np.argsort(shanny_obs)
+base = base[game_order]
+per_channel = per_channel[game_order, :]
+
+base_layer = expit(base)
+channel_layers = []
+cumulative = base.copy()
+
+
+for i in range(len(coords['channels'])): 
+    cumulative = cumulative + per_channel[:,i]
+    channel_layers.append(expit(cumulative))
+
+
+observed = scaled_y['explosive_play_rate_transformed'].to_numpy()[shanny_mask]
+games = np.arange(len(shanny_obs))
+
+fig, ax = plt.subplots(figsize = (14,6))
+
+colors = plt.cm.tab10.colors
+
+
+ax.fill_between(games, 0, base_layer, color = 'gray', alpha = 0.5,
+                label = 'Base Contribution')
+
+prev_layer = base_layer.copy()
+
+for i, channel in enumerate(coords['channels']):
+    ax.fill_between(games, prev_layer, channel_layers[i], 
+                    color = colors[i], alpha = 0.6, label = channel)
+    prev_layer = channel_layers[i]
+
+ax.plot(games, observed, color = 'black', linewidth = 1, label = 'Observed')
+ax.set_xlabel('Games')
+ax.set_ylabel('Explosive Play Rate')
+ax.legend(loc = 'upper left', bbox_to_anchor = (1,1))
+plt.tight_layout()
+
+mu_samples = az.extract(idata_spline, var_names='mu').values 
+x_saturated_samples = az.extract(idata_spline, var_names='x_saturated').values
+
+channel_names = coords['channels']
+play_callers = coords['play_callers']
+
+channel_names
+
+records = []
+
+for i, channel in enumerate(channel_names): 
+    mu_without = mu_samples - x_saturated_samples[:, i, :]
+    marginal = expit(mu_samples) - expit(mu_without)
+    for c, caller in enumerate(play_callers):
+        caller_mask = coach_idx == c
+        if caller_mask.sum() == 0:
+            continue
+        
+        avg = marginal[caller_mask, :].mean(axis = 0)
+        hdi = az.hdi(avg, hdi_prob=0.89)
+        records.append(
+            {
+                'play_caller': caller, 
+                'channel': channel,
+                'mean': avg.mean(), 
+                'low': float(hdi[0]), 
+                'high': float(hdi[1])
+            }
+        )
+
+
+contribution_df = pd.DataFrame(records).sort_values('mean')
+
+just_shanny = contribution_df[contribution_df['play_caller'] == 'Kyle Shanahan']
+
+fig, ax = plt.subplots()
+
+for i, (_, row) in enumerate(just_shanny.iterrows()):
+    ax.plot(
+        [row['low'], row['high']], [i, i]
+    )
+    ax.scatter(row['mean'], i)
+
+
+ax.set_yticks(range(len(just_shanny)))
+ax.set_yticklabels(just_shanny['channel'])
+
+ax.axvline(0, color='black', linestyle='--', linewidth=0.8)
+ax.set_xlabel('Average marginal contribution to explosive play rate')
+ax.set_title('Kyle Shanahan — personnel marginal contributions')
+plt.tight_layout()
+plt.show()
+
+
+mu_samples = az.extract(idata_hsgp, var_names='mu').values 
+x_saturated_samples = az.extract(idata_hsgp, var_names='x_saturated').values
+
+channel_names = coords['channels']
+play_callers = coords['play_callers']
+
+channel_names
+
+records = []
+
+for i, channel in enumerate(channel_names): 
+    mu_without = mu_samples - x_saturated_samples[:, i, :]
+    marginal = expit(mu_samples) - expit(mu_without)
+    for c, caller in enumerate(play_callers):
+        caller_mask = coach_idx == c
+        if caller_mask.sum() == 0:
+            continue
+        
+        avg = marginal[caller_mask, :].mean(axis = 0)
+        hdi = az.hdi(avg, hdi_prob=0.89)
+        records.append(
+            {
+                'play_caller': caller, 
+                'channel': channel,
+                'mean': avg.mean(), 
+                'low': float(hdi[0]), 
+                'high': float(hdi[1])
+            }
+        )
+
+
+contribution_df = pd.DataFrame(records).sort_values('mean')
+
+just_shanny = contribution_df[contribution_df['play_caller'] == 'Kyle Shanahan']
+
+fig, ax = plt.subplots()
+
+for i, (_, row) in enumerate(just_shanny.iterrows()):
+    ax.plot(
+        [row['low'], row['high']], [i, i]
+    )
+    ax.scatter(row['mean'], i)
+
+
+ax.set_yticks(range(len(just_shanny)))
+ax.set_yticklabels(just_shanny['channel'])
+
+ax.axvline(0, color='black', linestyle='--', linewidth=0.8)
+ax.set_xlabel('Average marginal contribution to explosive play rate')
+ax.set_title('Kyle Shanahan — personnel marginal contributions')
+plt.tight_layout()
+plt.show()
+
+
+mu_post = (
+    az.extract(idata_hsgp, var_names='mu')
+    .to_dataframe()
+    .reset_index()
+)
+
+x_sat_post = (
+    az.extract(idata_hsgp, var_names='x_saturated')
+    .to_dataframe()
+    .reset_index()
+)
+
+mm_alpha_post = (
+    az.extract(idata_hsgp, var_names=['mm_alpha'])
+    .to_dataframe()
+    .reset_index()
+)
+mm_lam_post = (
+    az.extract(idata_hsgp, var_names=['mm_lam'])
+    .to_dataframe()
+    .reset_index()
+)
+
+x_adstock_post = (
+    az.extract(idata_hsgp, var_names='x_adstock')
+    .to_dataframe()
+    .reset_index()
+)
+
+mm_alpha_post.columns
+
+
+post_df = (
+    mu_post.merge(x_sat_post, on = ['obs_id', 'chain', 'draw'])
+    .merge(mm_alpha_post, on  = ['chain', 'draw', 'channels'])
+    .merge(mm_lam_post, on = ['chain', 'draw', 'channels'])
+    .merge(x_adstock_post, on = ['obs_id', 'chain', 'draw', 'channels'])
+)
+
+
+
+post_df['play_caller'] = pd.Categorical(
+    [play_callers[i] for i in coach_idx[post_df['obs_id'].values]],
+    categories = play_callers
+)
+
+post_df_hsgp = (pl.from_pandas(
+    post_df
+)
+    .with_columns(
+        pl.lit('HSGP Specification').alias('id')
+    )
+)
+
+mu_post = (
+    az.extract(idata_spline, var_names='mu')
+    .to_dataframe()
+    .reset_index()
+)
+
+x_sat_post = (
+    az.extract(idata_spline, var_names='x_saturated')
+    .to_dataframe()
+    .reset_index()
+)
+
+
+mm_alpha_post = (
+    az.extract(idata_spline, var_names=['mm_alpha'])
+    .to_dataframe()
+    .reset_index()
+)
+mm_lam_post = (
+    az.extract(idata_spline, var_names=['mm_lam'])
+    .to_dataframe()
+    .reset_index()
+)
+
+x_adstock_post = (
+    az.extract(idata_spline, var_names='x_adstock')
+    .to_dataframe()
+    .reset_index()
+)
+
+post_df = (
+    mu_post.merge(x_sat_post, on = ['obs_id', 'chain', 'draw'])
+    .merge(mm_alpha_post, on  = ['chain', 'draw', 'channels'])
+    .merge(mm_lam_post, on = ['chain', 'draw', 'channels'])
+    .merge(x_adstock_post, on = ['obs_id', 'chain', 'draw', 'channels'])
+)
+
+post_df['play_caller'] = pd.Categorical(
+    [play_callers[i] for i in coach_idx[post_df['obs_id'].values]],
+    categories = play_callers
+)
+
+
+post_df_spline = (
+    pl.from_pandas(post_df)
+    .with_columns(pl.lit('Spline Specification').alias('id')
+    )
+
+)
+
+
+big_data_frame = pl.concat([post_df_hsgp, post_df_spline], how = 'diagonal')
+
+big_data_frame.write_parquet(
+    'contributions/mmm-vanilla-beta-personnel-contributions.parquet',
+    compression = 'zstd'
+)
 
 
