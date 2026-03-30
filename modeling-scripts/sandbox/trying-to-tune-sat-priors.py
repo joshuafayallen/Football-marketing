@@ -466,7 +466,7 @@ with pm.Model(coords = coords) as mmm_hsgp:
     )
 
     personnel_contribution = pm.Deterministic(
-        'personnel_contribution', 
+        'personnel_contritbution', 
         (x_saturated_pairs * coach_match).sum(axis =1), 
         dims = 'obs_id'
     )
@@ -499,6 +499,11 @@ with pm.Model(coords = coords) as mmm_hsgp:
 with mmm_hsgp:
     idata_hsgp = pm.sample_prior_predictive()
 
+az.plot_ppc(idata_hsgp, group = 'prior', observed = True)
+prior_y = idata_hsgp.prior_predictive['y_obs'].values.flatten()
+
+prior_y.min()
+prior_y.max()
 
 with mmm_hsgp:
     idata_hsgp.extend(
@@ -509,6 +514,13 @@ with mmm_hsgp:
 idata_hsgp.sample_stats['diverging'].sum().data
 
 
+fig, ax = plt.subplots()
+az.plot_forest(
+    data = [idata_hsgp.prior, idata_hsgp.posterior],
+    model_names=['prior', 'posterior'],
+    var_names=['mm_lam'],
+    combined = True
+)
 
 with mmm_hsgp:
     pm.sample_posterior_predictive(idata_hsgp, extend_inferencedata=True)
@@ -517,13 +529,6 @@ with mmm_hsgp:
 az.plot_ppc(idata_hsgp, kind='cumulative')
 az.plot_loo_pit(idata_hsgp, y='y_obs', legend=True)
 
-fig, ax = plt.subplots()
-az.plot_forest(
-    data = [idata_hsgp.prior, idata_hsgp.posterior],
-    model_names=['prior', 'posterior'],
-    var_names=['mm_lam'],
-    combined = True
-)
 loo = az.loo(idata_hsgp, pointwise=True)
 az.plot_khat(loo, show_bins=True)
 
@@ -561,7 +566,7 @@ az.plot_ess(
     kind = 'evolution'
 )
 
-az.plot_ess(
+az.plot_trace(
     idata_hsgp, 
     var_names=['contribution'],
     filter_vars='like', 
@@ -608,88 +613,249 @@ print(az.summary(
     var_names=['adstock_alphas', 'mm_alpha', 'mm_lam', 
                'global_baseline', 'coach_sigma', 'controls_beta'],
 )[['mean', 'sd', 'ess_bulk', 'ess_tail', 'r_hat']])
-# everything looks dandy 
-idata_hsgp.to_netcdf('model/mmm-binomial.nc')
 
 
-coach_group_pairs = (
-    pl.from_pandas(
-        idata_hsgp.posterior['x_saturated_pairs'].to_dataframe().reset_index()
+
+
+
+
+
+_epr_raw = raw_data['n_explosive'].to_numpy() / raw_data['total_plays'].to_numpy()
+_epr_raw_valid = _epr_raw[(_epr_raw > 0) & (_epr_raw < 1)]
+
+_logit_mean_baseline = float(np.mean(logit(_epr_raw_valid)))
+
+with pm.Model(coords = coords) as mmm_root:
+    global_controls = pm.Data(
+        'control_data',
+        just_controls_sdz.drop('avg_pass_rate', axis = 1),
+        dims = ('obs_id', 'predictors')
     )
-)
 
-
-cleanup = (
-    coach_group_pairs
-    .with_columns(
-        pl.col('coach_group_pairs').str.split_exact('|',1)
-        .struct.rename_fields(['coach', 'personnel_grouping'])
-        .alias('parts')
-
+    passing_dat = pm.Data(
+        'passing_data', 
+        just_controls_sdz['avg_pass_rate'], 
+        dims = 'obs_id'
     )
-    .unnest("parts")
-    .drop('coach_group_pairs')
-)
 
-personnel_contributions = (
-    pl.from_pandas(idata_hsgp.posterior['personnel_contribution']
-    .to_dataframe()
-    .reset_index()
+    personnel_dat = pm.Data(
+        'personnel_data', 
+        personnel_scaled.to_numpy(),
+        dims = ('obs_id', 'channels')
     )
-)
 
-coach_mean = (
-    pl.from_pandas(
-        idata_hsgp.posterior['coach_mean']
-        .to_dataframe()
-        .reset_index()
+    n_plays = pm.Data(
+        'n_plays', 
+        raw_data['total_plays'].to_numpy(), 
+        dims = 'obs_id'
+    )
+
+    n_explosive = pm.Data(
+        'n_explosives',
+        raw_data['n_explosive'].to_numpy(),
+        dims = 'obs_id'
+    )
+
+    coach_id = pm.Data('coach_id', coach_idx, dims = 'obs_id')
+    tenure_id = pm.Data('tenure_relative',
+                        tenure_idx,
+                        dims = 'obs_id')
+
+    career_exp_dat = pm.Data(
+        'career_exp', 
+        raw_data['career_scaled'].to_numpy(), 
+        dims = 'obs_id'
+    )
+
+    pair_coach_id = pm.Data('pair_coach_id', pair_coach_idx)
+    pair_group_id = pm.Data('pair_group_id', pair_group_idx)
+
+    global_baseline = pm.Normal('global_baseline', _logit_mean_baseline,1 )
+
+    coach_sigma = pm.HalfNormal('coach_sigma', 1)
+
+# Per-coach deviation (non-centered)
+    coach_offset_raw= pm.Normal('coach_offset_raw',
+                                mu = 0,
+                                sigma = 1,
+                                dims='play_callers')
     
+    coach_offset = pm.Deterministic(
+        # add sum to zero constraint
+        'coach_offset', 
+        coach_offset_raw - coach_offset_raw.mean(), 
+        dims = 'play_callers'
     )
-    .rename({"coach_mean": 'coach_intercept'})
-)
-coach_mean.columns
 
-overall_mean  = (
-    pl.from_pandas(
-        idata_hsgp.posterior['mu']
-        .to_dataframe()
-        .reset_index()
+    coach_mean = pm.Deterministic(
+    'coach_mean',
+    global_baseline + (coach_sigma * coach_offset),
+    dims='play_callers')
+
+
+    tenure_hsgp = HSGP(
+        eta= eta_prior,
+        ls = ls_prior,
+        m = m_seasons, 
+        L = l_seasons,
+        X = unique_tenure, 
+        X_mid = tc_mid,
+        cov_func=CovFunc.Matern52,
+        dims = 'tenure', 
+        centered = False, 
+        drop_first=True
     )
-    .rename({'mu': 'overall_mean'})
-)
 
-overall_mean.columns 
-obs_metadata = (
-    raw_data
-    .select(['season', 'week', 'off_play_caller', 'tenure_relative'])
-    .with_row_index('obs_id')
-)
+    tenure_effect= tenure_hsgp.create_variable('tenure_effect')
 
-add_personnel_contributions = (
-    cleanup
-    .join(personnel_contributions, on = ['chain', 'draw', 'obs_id'])
-    .join(coach_mean, left_on = ['chain', 'draw', 'coach'],
-                        right_on = ['chain', 'draw', 'play_callers'])
-    .join(overall_mean, on = ['chain', 'draw', 'obs_id'])
-    .join(obs_metadata, left_on = ['obs_id', 'coach'],
-                        right_on = ['obs_id' ,'off_play_caller'])
-    
-    .with_columns(
-        # make sure i don't get datatype error in R 
-        # later 
-        pl.col('coach', 'personnel_grouping').cast(pl.String)
+    coach_mu = pm.Deterministic(
+        'coach_mu', 
+        coach_mean[coach_id]
+        + tenure_effect[tenure_id],
+        dims = 'obs_id'
     )
+    controls_prior = pm.Normal(
+        'controls_beta', 
+        mu = 0,
+        sigma = 0.05,
+        dims = 'predictors'
+    )
+
+    control_contribution = pm.Deterministic(
+        'control_contribution', 
+        pm.math.dot(global_controls, controls_prior)
+    )
+    passing_prior = pm.Normal(
+        'passing_prior', 
+        mu = 0, 
+        sigma = 0.1,
+    )
+
+    passing_contribution = pm.Deterministic(
+        'passing_contribution', 
+        pm.math.dot(passing_dat, passing_prior),
+        dims = 'obs_id'
+    )
+
+    adstock_alphas = pm.Beta(
+        'adstock_alphas', 
+        alpha = 1,
+        beta = 5, 
+        dims = 'channels'
+    )
+
+    make_adstocks, _ = pytensor.scan(
+        fn = lambda col, alpha: geometric_adstock(
+            col, alpha, l_max = 2
+        ),
+        sequences=[personnel_dat.T, adstock_alphas]
+    )
+    x_adstock = pm.Deterministic(
+        'x_adstock',
+        make_adstocks.T,
+        dims = ('obs_id', 'channels')
+    )
+
+    root_alpha = pm.Gamma(
+        'root_alpha',
+        alpha = 3, 
+        beta = 6, 
+        dims = 'coach_group_pairs'
+    )
+
+    x_for_pairs = x_adstock[:, pair_group_id]
+
+    x_saturated_pairs = pm.Deterministic(
+        'x_saturated_pairs',
+        root_saturation(x_for_pairs + 1e-6, root_alpha[None, :]),
+        dims = ('obs_id', 'coach_group_pairs')
+    )
+
+    personnel_scaling = pm.HalfNormal('personnel_scaling', 0.1 )
+
+
+
+    coach_match = pt.eq(
+        coach_id[:, None],
+        pair_coach_id[None, :]
+    )
+
+    personnel_contribution = pm.Deterministic(
+        'personnel_contribution', 
+        ((x_saturated_pairs * coach_match).sum(axis =1)), 
+        dims = 'obs_id'
+    )
+
+    mu = pm.Deterministic(
+        'mu',
+        coach_mu + 
+        personnel_contribution + 
+        control_contribution + 
+        passing_contribution, 
+        dims = 'obs_id'
+    )
+
+
+    mu_logit = pm.math.invlogit(mu)
+
+
+
+    pm.Binomial(
+        'y_obs',
+        p = mu_logit,
+        n = n_plays,
+        observed = n_explosive, 
+        dims = 'obs_id'
+    )
+
+
+with mmm_root: 
+    idata_root = pm.sample_prior_predictive()
+
+
+
+
+
+az.plot_ppc(idata_root, group='prior', observed=True)
+
+with mmm_root:
+        idata_root.extend(
+        pm.sample(random_seed=RANDOM_SEED, nuts_sampler='nutpie'))
+
+print(mmm_root.compile_logp()({}))
+
+
+
+with mmm_root:
+    idata_root.extend(
+        pm.sample_posterior_predictive(idata_root)
+    )
+    pm.compute_log_likelihood(idata_root)
+
+
+az.plot_ppc(idata_root, kind = 'cumulative')
+
+idata_root.sample_stats['diverging'].sum().data
+
+# okay this looks like we are getting some slightly stronger updating 
+# but its not like worlds away 
+az.plot_forest(
+    data = [idata_root.prior, idata_root.posterior],
+    model_names=['prior', 'posterior'],
+    var_names=['root_alpha'],
+    combined = True
 )
 
 
-add_personnel_contributions.write_parquet(
-    'contribution',
-    partition_by = ['coach', 'personnel_grouping'],
+mod_dict  = dict(zip(['MM saturation', 'root_saturation'], [idata_hsgp, idata_root]))
+# that is a pretty big difference
+az.compare(mod_dict)
+
+## lets just go throught the bit just to make sure things look good 
+
+az.plot_ess(
+    idata_root, 
+    var_names=['contribution'], 
+    filter_vars='like',
+    kind = 'evolution'
 )
-
-
-
-
-
-
-
