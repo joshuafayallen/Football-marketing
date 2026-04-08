@@ -24,6 +24,7 @@ import numpy as np
 from patsy import dmatrix
 import seaborn as sns
 from scipy.special import expit
+import xarray as xr 
 ## for whatever reason my version of pymc marketing doesn't have this 
 ## so we are just copying it from the source code
 
@@ -611,6 +612,7 @@ print(az.summary(
 # everything looks dandy 
 idata_hsgp.to_netcdf('model/mmm-binomial.nc')
 
+idata_hsgp = az.from_netcdf('model/mmm-binomial.nc')
 
 coach_group_pairs = (
     pl.from_pandas(
@@ -661,8 +663,11 @@ overall_mean  = (
 overall_mean.columns 
 obs_metadata = (
     raw_data
-    .select(['season', 'week', 'off_play_caller', 'tenure_relative'])
+    .select(['season', 'week', 'off_play_caller', 'tenure_relative', 'total_plays', 'n_explosive'])
     .with_row_index('obs_id')
+    .with_columns(
+        (pl.col('season') + (pl.col('week')-1)/18).alias('time')
+    )
 )
 
 add_personnel_contributions = (
@@ -688,6 +693,44 @@ add_personnel_contributions.write_parquet(
 )
 
 
+
+
+idata = az.from_netcdf('model/mmm-binomial.nc')
+
+raw_data_pd['time_decimal'] = (
+    raw_data_pd['season'] + (raw_data_pd['week'] - 1) / 18
+)
+
+
+shanny_mask = raw_data_pd['off_play_caller'] == 'Kyle Shanahan'
+shanny_obs = np.where(shanny_mask)[0]
+
+time_vals = raw_data_pd.loc[shanny_mask, 'time_decimal'].values
+
+obs_rate =  (raw_data['n_explosive'].to_numpy()[shanny_mask] / 
+            raw_data['total_plays'].to_numpy()[shanny_mask])
+
+mu_samples = az.extract(idata, group = 'posterior', var_names=['mu']).values[shanny_obs, :]
+
+p_samples = expit(mu_samples)
+
+
+df_shanny = raw_data_pd[shanny_mask].copy()
+
+seasons = sorted(df_shanny['tenure_relative'].unique())
+
+n_seasons = len(seasons)
+
+cols = 2
+
+rows = (n_seasons + cols - 1) // cols
+
+fig, axes = plt.subplots(
+    rows, cols, figsize=(12, 2.5 * rows), layout="constrained", sharey=True
+)
+
+fig, axs = plt.subplots(n_seasons,1 ,sharex=False, sharey= False)    
+    
 
 
 
